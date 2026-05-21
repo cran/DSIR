@@ -7,15 +7,15 @@
 sdg_areas()
 }
 \value{
-A data frame with area codes and names, or \code{NULL} when
-the service is unreachable.
+A \link[tibble:tibble]{tibble} with area codes and names, or
+\code{NULL} when the service is unreachable.
 }
 \description{
 Fetches the list of geographic areas available from the UN SDG
 database.
 }
 \examples{
-\dontrun{
+\donttest{
 sdg_areas()
 }
 }

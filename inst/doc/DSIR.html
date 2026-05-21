@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>DSIR</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<style type="text/css">.tabwid {
+font-size: initial;
+padding-bottom: 1em;
+}
+.tabwid table{
+border-spacing:0px !important;
+border-collapse:collapse;
+line-height:1;
+margin-left:auto;
+margin-right:auto;
+border-width: 0;
+border-color: transparent;
+caption-side: top;
+}
+.tabwid-caption-bottom table{
+caption-side: bottom;
+}
+.tabwid_left table{
+margin-left:0;
+}
+.tabwid_right table{
+margin-right:0;
+}
+.tabwid td, .tabwid th {
+padding: 0;
+}
+.tabwid a {
+text-decoration: none;
+}
+.tabwid thead {
+background-color: transparent;
+}
+.tabwid tfoot {
+background-color: transparent;
+}
+.tabwid table tr {
+background-color: transparent;
+}
+.katex-display {
+margin: 0 0 !important;
+}
+</style>
+<script>document.addEventListener("DOMContentLoaded", function(event) {
+  var els = document.querySelectorAll(".tabwid");
+  var tabwid_link = document.querySelector('link[href*="tabwid.css"]')
+  if (tabwid_link === null) {
+    const tabwid_styles = document.evaluate("//style[contains(., 'tabwid')]", document, null, XPathResult.ANY_TYPE, null );
+    tabwid_link = tabwid_styles.iterateNext();
+  }
+
+  Array.prototype.forEach.call(els, function(template) {
+      const dest = document.createElement("div");
+      template.parentNode.insertBefore(dest, template.nextSibling)
+      dest.setAttribute("class", "flextable-shadow-host");
+      const fantome = dest.attachShadow({mode: 'open'});
+      fantome.appendChild(template);
+      if (tabwid_link !== null) {
+        fantome.appendChild(tabwid_link.cloneNode(true));
+      }
+  });
+
+  const shadowHosts = document.querySelectorAll('.flextable-shadow-host:not(:has(div > table.no-shadow-dom))');
+  shadowHosts.forEach(host => {
+    if (host.shadowRoot) {
+      const spanElements = host.shadowRoot.querySelector('div > table > caption > span[id]');
+      if (spanElements) {
+        const id = spanElements.getAttribute("id");
+        host.setAttribute("id", id);
+      }
+    }
+  });
+
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">DSIR</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(DSIR)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;dplyr&#39;</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:stats&#39;:</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt;     filter, lag</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:base&#39;:</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
+<p><img role="img" aria-label="DSIR logo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCADwAPADASIAAhEBAxEB/8QAHAAAAAcBAQAAAAAAAAAAAAAAAQIDBAUGBwAI/8QAUhAAAQIEAwYDAgkGCgkDBQAAAQIDAAQFEQYSIQcTMUFRYSJxgRQyCBUjQmJzkaGxUnKys8HRFiQzN1NjdILD8BclJic0NlSS4TVkwkNEdaPS/8QAGgEAAgMBAQAAAAAAAAAAAAAAAwQAAQIFBv/EADMRAAIBAgQEBAUCBwEAAAAAAAECAAMRBBIhMRNBUXEiMmGhBSORscEz0RQVQlKB4fA0/9oADAMBAAIRAxEAPwD0Bx1gR3jo6EAI1BtAgR3zYEaiLmSZwEHgoEHAixKnJgUjpAeUCNI1JOAgbQIGv7YE6xJUC0CNI4cIG0SSFtxgTwhrValJUiRcnKpNsykq37zryso8h1PYaxjeItrNUr04uk7PJB5S1aGdcRdduqUnRA+kv7BBKdJm15dZhnCzZlTcqieRJLmWEzjiStDBcAcUkcSE3vaF7R5w/wBHDzr2aoYmaGLnjv0NqduSR1VfOT9IegIiboe1DEGEZxulY/knplkaInEAFwjqD7ro+xXnGuGjaU2ufp9OsoOR5hYTdAOUcYY0GtU2vyCZyjzjM3LnipB1SeihxSexiQsICQRoZsa7QnaOtBrW4COIiS4S1o7rBkgQUiJLgHtBTrB7QFokkJw4wWD8bwXyjEghRHDnA9YC14k3AtAWg8FHExnWSDaOECBBwI3KJhYMPOOtx6QNtIgmYI4QPWAAg4EalQAINbXSOAgQNYkkACDAaQMU/HW0ShYPbU3OPGZqAFxJS5Bc/vHggeevYxaoXNllFguplvUQlJUogJSLkk2AHUmMrxttiptMdVIYZbFYqSjkC0XLCFdARq4eydO8UeoTuL9pt3Jx1FGw372S5S2pI5m9i4e5smI9WJcO4LbXL4TlkVGpWyrqL+qR5HmOybDuYYSmoOUeJug2HcwTOSL7D/to6nMP1StLFe2n1oycqn3JdSgFW/JSkaI8gCrrEdVdoTUnKGlYIkE02T93f5flnD1A1se5ufKK0/8AG+J5z2yqTK134OO6ADohI0A8rCJmn02XkU/Ipu5zcVqo/uh+ngy1mqm/pyH7xJ8SFuE+vOV9VKqLwVNuKUqZKs5zrO8J/Kv19bxZ6FtAfbl1UnF0mKtTj4Vb1ILyO+vvW9D3h6iTdVKKmQkboGxN9fsiPnpBicRlfQCrgFjRQ9YO9ClVFuntApXdDfrJmWw26y6a9sura1KT78tvLOJ+ib+8PorHqYu2ENsku5MCmY1ljSqgg5FTGQhon6aTq356jyjExK1OgzYnaXMupWjg6zooDoRzH2iLVLYxo2KmESeNpNDUwkZW6lLjKU+dtU/ensIRq0HTRhmXrzH7xynVV9VNj7f6npxhxt9lD0u426ysZkOIUFJUOoI0Ig1uMecpBnFWz0e34YnU1jD7nyimkjOgjqUA6H6SD5xqWA9qVDxXu5ZS/i+qK09lmFCyz/Vr4K8tD2hM0ri6G4/7eMh9bNoZebQFoPaxN+UARAoSE5QXhB7dIC2kSSF4iCkawe0Ft3irS4QjlHWg5EFIOsZlg2heZ6QFoNAdxEmgYKRBtQYAaEwYRYmJwP2wYCCgCFANI1JOGkDf0jhwgkw61LS7j8y62yw0nMtxxQSlI6knQRW8qKgWEReI8Q0rDcgZytzrUoxwSFaqcPRCRqo+UZdjPbQkzBpeBZU1GeWcom1Nktg/1aOK/M2T5xQ5ihfKmu7Taw47MOaplt5mcX9HTgPoosB1EHWkF1c/45mCzk+X68pZK9tJxLjaYdp2BJR6Rkgcrk2SEukd18Gx2F1d4rzcnhnBRU7W3hXK9fMZdOqEK+lfn3Vc9oi6vjydmmRS8MS3xXT/AHUoYA3qh5j3fTXqYiadh7XeT6iSdd2k/if3Q7Twz1BY+Feg3PcxZ6yJruf+2Ec17Edcxg+WlqKJMHSWa8LSRyzH5x8/QCFKZQmJYBb9n3R1HhHkP3xJtoS02ENJShA0CUiwhcICB8sSk8kj3v8Ax6x0KdJKS2UWiT1WqG5MAJUtWVIJPQQYBKPf8augOg9efpBVOkpKUjKnoOfn1gumW99b8ILBRx7Q8ZdTW8IaJ9waCEhbnBb+E+cOaXLNzs2GXpyXk0lJO9mCQjTloDqYzooJk1Y2iERdSo8vNkrQNy9xzJGh8xFvreH1UulS0/8AGElNMTKsrW5Krrte5FwLgW49xELLJbdmEIddDKCdVkXtGVdXXMNpooyGx0MrtHrVdwfNZpN0iXUq6mj4mXPTke4sYtC1YVx2OCaFX3OoG6eV9wP3K84ZvJFloUAtBJGo0UPKICo0BC0qXJHIrjulHwnyPKF6uEVzmQ2bqIxTxJUZW1E0Sk42xds8cblMTy7lVo4ORDxXdSR9Bw/or16ERsuE8WUbFcmX6LOJdUkXcYV4XWvzkHUeeo7x5moGOarRUmm1hn4xpxGVUvM6qCfoqN7jsbjyiZl8PU6rOCr7O6o5IVJjxmTU4W1tn6JvdI+1PcRz6lMrpVFvUbf56R2m1/Ib+nOenCOkF5RimE9sM5TJsUraDIusPJ09sbbsfNaBoR9JH2RslPnpSpyTU3T5lmZlXRdDrSgpKvX9kLNSZe0MrhtotaC8oPY6wEYm4SCEQoRBbExVpcJAQdQ1goMZliHA0gUx0CBFyoKYMBc2H2RA4uxVSMJU9M1WpndBwlLTSE5nHiOISnnyuTYC+pjEq1jfFu0Jx2ToDCqRQycq3AshSx9Nwan81HreDJSLDMxsOsGz2NhqZpeO9q9CwvvJaXWKpVE6GXl1jI2f6xfAeQufKMoqZxRjse34unhSqE2c6WD8mgDqEE8fpLN+kRyX8M4MNpUCs1pHzyRu2lduIHpc9xFdqM/WsVzO9nHSphJ8Kfdab8hzPfU94ao0mf8ASFh/cd/8CAqVFXzm56D8ywzOL6Vh+WcksGSSd4oZVz76bqV3AOp9bDtFbRT6hWJpU5VH3SpepW6brV5DkP8ANok6dSJeSIVbePflqHDyHKJNCVKJCEqUewvHRo4ZKeu56neJVMQz6DaISUmxJt5GEZSeKuJPmYcnhpDyWSg0eaUpKSsK0VbUcIYXPWDK17jpFyCNZM1mcpzjcqKTLKl1pRZ1RFj5XvqeOsROb7YBeYJRcJHh0t0uYZFibq9TYo9OWEOupLsw+eEuykXUs+n7BzjC5aKXJ0HWbAaq+g1jpt5txSghaVlOigkg284VBhDEmGmMP0iTrFJQ6jcqCZlC1XK21GwUe/C/LXtD2iMNVCfl2FiaWl8hKEyqUqWonhYKIEYoYlKyF12ELXwj0HytF6PLys5OCXm5iYZK7BrcS++UtZNgm1xEs5SaPTsWokajUlOyDOsy4GiPGNd3pfsCRw1gJaoSeFcSTK6Zu6ohtBZS86cuVR0UUFJ8xfztELVJuXnJgOSsi1JJy2KG3FrCjc+IlRJvEGZ2uCQpEx4UXqQZP41fkajMKnZasszKgQ0zKNS62wy0OABOmn33ircDzgIUlXUMzLbjrKH0JUCWl3yrHQ2gtNOGuXeDds7XMKFcx5GB0PDQwQqGdRACUknQcofv0t6WYQ88UlKreFJsQTwFzpFs4WwPOUELXtI1+TanWih9CS2PnK+b5GICZo81IPCbpbrpLavApCsrqD2txizKStRsd2lI4Jziw++F0SqzIrcStslLg8KVXJ0imsRrNLcbRpTccytTlRTcbyInGRombbTZ1s9SBz7psexiTp9OrmFlms7PKr8YU1w5lsJIXmHRSOC/SyhFdn6YxO5t4nI7w3iePr1iLknazhabM1TphSEn3lI1QsdFpP7fthJ8IVuaRt6Hb/UcTEBtH+vOb9gbbFR64tElWkikVO+SzqvkVq6BR909lfaY0zlfkY8vir4YxkgN4hYRSawoZRONaNrPcn8FeiolKXXcZ7NilLoFYw4LZQpRUhKfoq95vyN0wi9NWNvK3Q/gxtXIF9x1/eeiiICK3gfG9GxlLLVSnVommkhT0o8LONjhfoRfS4+6LIRC7KVNmhlIIuIUgGCcDBxAKjBlwwtB08IInhB06RcqYl8JoAnCwUAQXXgb9Pk4pe1irTknU0UaSdEtThLoUWmRkzXKhYkctBpwi6/Ca97Cv1z3+HGebYh/tin+zN/pKh6ioZ6YboYs5IRyPSQ9OoDbVlTZDihwQn3R++J1OVKQBZKQLADlAX0iXrRprSZY0tJC1IutRuSOnHnx4R1i+Vgtt5zMpYFidpHNNqcfQ0PCpRt4uUSFMaMvPvtFQJSjiOHKIkOKQ4FpUQoG4POFEzjqXVOh5QcVoo9YtlJFpSEDUx9LH/U03r8/90R3qYRmagiUlXC69kZOqh1MKSFCqtWl2ZyoOmiUd4Bbbqk3ffR1Qn9ug84FUqpQBaobCFp0XrkKgic3OS8o3mfWlGVOoKhdR14CLdgaiOSeDhUHGyqq4lfbSE80y2bwIH51iryywLeFcL4fq1PUikpq0pMhP8ZqThdJvoTkFk8wY0cWTPyk3u2wqUJLTYTZCPDlFh0A4COFjfia104aXAnZwnw9qDcRtZAYkoS36fNyMw0QzMtqZCyLJKrfN6gG2vaMnwdVJqSlWH5V1TM3LlTJULXBGhGvbSN7qroqqkmYQ007cXeQjxWHLjwjDcbYeqmGMQOkPSsvQqnNlTdTKFONNFXELABKSNdCO4vrG/hVZAWQnQy/iatURX/qEXn596deVMTroU5YArISkWHDgAIiJms0+W/lJpsnok5j90XZWyumtSiZufq01X5i2fcsfIsqHHwm5J+0XiQwPPU2l1MS1PoVMlUu+FLimQ44Fjh4la9R5w1U+L0qZyoLxOl8LqVBmYzNG62l/wD4aQqD/dDBMOUzU4Wys0KsbscVCVUR+Ea/jmfn/ZmZxmZWhSDu1hAAFjwP26esFwHWqmqVnQuefIS4kgE9Qf3Qr/O2v5dIz/J1y3zTHBiCRQ5u172XcH9O2Un7OUSzU6JmURkmQ+hCinLmzC1hbT7Y0XHtbceelJacl5SdRu1KWmYZCuJsPwMQshs7w7W6d7ZL+00CfcJLTkuorat1KDyJ6EQel8XpubOLQNT4TURcymVPKlYO60V+Qf2HnAtHKpCF6JULK7XPH0sDCWJqNWsGvBNfDM5ILtkn5TxIseGYcUnz9LxyJxqaQFhQW2r3XE6m3fr+MdZKi1BdTcTlvTZDZhaKKUpKlIeSFFOhudR6x2ULHyagfoq0P7jDv4tmpmVE0ygOIAyqUlQ1tzF+3HyhkA2geMhw/kpOnqf3RaurXynaZKMN5EVPDyXAHGUKYUrgCPCr05RL7KaxUWMSy1DXMFdPe3iFsL8aU2So+G/AXHDgekOJqZW4ywlWW2XNoO5H4CInZqf95cl9a/8AoLhbFqGosWHIxrDMQ4APSaDsOZbl9p+MGWEJbabbWlKEiwSA+NBG6EaRiGxbXavjT81z9eI3A6Xjl1tx2H2j9LY9zEzAcYORcQmRAYURQQdPAwRMKNxJUxD4TgN8LfWvfi3GebYf+ckf2Zv9JUaH8Jz38K9N69+LcZ3tiN8ZIP8A7Vv9JcPYf9ROxitTyP3ENyglSeVLyhdSnMpDOYJ62vC7EtMPSsxMNNKUxL5S6scEZjYXgswoFLfP5McfWOvfXScy1tTE8OUSp1yQZnnqqmUlnRdIl5YOKGtrG5GukT0tgJiaORjGr6Jj+jfp4H3Z4rmFqt/B6oqkZpVqVNKzNLPBlzoex/cesa5h2Vp846tqqMhxsDMSohKUJ/KKjr5ADWOBi8RiaNQjNpynosNhMNWo5wNRvKxS9lqJeacnKxWGas4yj+KS6ZdTSN7f3nAeKR0HH0h+C/WpF2SqClCqydy0F6FSeaf89oubbLEqFNyYcTLg+BK1lZA8zr6REVqVlZiZllLe9mnlKsw8kakjkeR8j1jjV8RUrteobx7D0koiyCVqWd9swxNSywQ/ILDqL8Qm+o9NYu3tTImW5VawJhbe8CSPeHY+hhi1Sm0TvtjhTv3Gi2+lCfA4dNbHhwiUk6azUavJrdvmlyVgpNiRbge0Btc2hWYbwdQCbaDnEZP1uktNzNPqK2Jhh5O7mJVSSpKx0NuB6HiDrEhi3FbaKtIYbw6+lVSL6HJ0sgKTKS6TmWF8gpVsoHHU9og6q9SZJxSHJRp59ZK902yFKNzfXpBjTaiQb6wNNhWuCNJXNns8KdXalhdM2qakWU+001xYsrck6oPdN/uVyiSxVTCxNMVOWGU71O9A630V+w+kQQlJ93aPhyalaQ4w1u3QtLLJIQ3qLrIFhcnnaNKdQpGjoHlcGN4kZir9Rr3lYc5CU6H2kfidAVQ54HkgqHmDeGGBWN1SVvL0L7mYfmjQH8Ykqw9KIpcyqpvJZkw2d6tSsoCfOKzR53EWKZcrwjKStKoTXgTVKmk2WBp8m2OP3+hgdKg9QXGw5mbestMZTuYcU12v1h2dfSpuRCsqcwsXEjgB58z3ix1GoS1Lky4+QhCRZCE6FR5AD/NoaM0GdZIM3jSqzTnMMSEu036BQJh+mUSQn2paZxaPccdYQlQ+zT7LRmpTC7MDLWqX3UiVSjiqVSeemFACUf0eDqczSk8MuU+9ppEDjrBiMOldcwwha6MCDOyCiSqWPDOk80fhz04aBUq5I04lD7uZ0D+SQLq/cIq0xiWem55CpVGRCSQGUpzhYOhCx84EXBHDWD4TFPQe42g8ThRiFsZX6bXXkUlaJZbS5dZ8Ph5KvcDpw9IYKTpnb1bOndPYwjWqZ/BuuJlkNLYpdSHtMq0vUsrGimie19OxT3g7bhb8QtYixBGih5R66gUdeInOeXrK6Nw25RV0WLY6Np/f+2GWzXTaRJfWP/oLiQqDksZhJki4WsiR8oNb8P3RHbNiP9I8n9Y/+guB4k3oMfQzeHFqoHqJo2xT+dfGn5jn68RuZEYZsU12rYz/ADHP14jczwjlVtx2H2j9PY9zCWgh0g5vBDAYUQw4wokQRIvB0iJKmIfCd9/Cv1r34txne2Ej+GLf9mb/AElRonwndF4VP9a9+LcZztgt/DJv+yt/pKh7D/qJ2MXqeR+4hSo2ICiAeIB0MLsS01UJ6Rp9PYU/OzICGm08zc6noBxv2hpnBjWtgMigN1ivOIDj6VpkWCR7otmVbzukQ9iq3BS43ieGpcRtZM0PY/QpKjPjEtqpPPNELUVlCGiR/wDTHG4/KP2CM3dZqGC8QSVDqC1T1OmlEU+buAtITrkWOwt9ummg9EVJtEzSVIaKt6UEt2HjJHIdydIwbahMsOs4erLT4eRTqju5i+i2QsWIWk6pIKbaiOIXaqcp1B+869L5fiU2I+0vYdDiQtJ0ULj1hdzDPx1KIMyvcoCs7ax7wPURSWa443OJkJXduBOq3FXs2O1uP/mJefVVZ+YU5TMW1OnsOWBl2kNLCdLeAqTmTw4XMcqmi38ZtOk+cC6iWifpb8qkrJDiBYqI0I7kfthoy8pne7tam1raW2Fp4oKkkBQ7g2PpEVg/AlONYbmWVThnW7uPz7kytTzoOhCzeygb+7a0F2gyVapAnHGJeaXSmWS57TLIzE2ST8pY50i4t4R3JF4JwbkNT1ECtS90qaSVwvgR2iUOWl5Flj+SSp1xJAU+u2q1HiSTc6nnEvJ0wy6lZ5YvTGmYqGVtHYn5x+7zhbCeKaP8W4dpqKyxP1GbYQEIZcDyyQ3mUpeUnKkWIurnYcYqG2XG6pGc+IMPEu1+YbCbpNxKpPFZ6KsdPt6Xa/hiTc7+sXFewyjb0kNNLTiHaSqYRX5Nyn0xv2dEnLrdUlLuucqSE5L+8OJ4CLI/maaWWilRSLg20MZ9hKlz+HZYIkqe7MEjxOOJIzE6lXr+EWxFVd+LJt6bk3ZV1hBUQseFWh4GFK7Co9l2GgjlJDTW7StOuy2NsTvsVHeN4VoDaZioIB/4h86JauOOunorqImppVery0rCxTaegBLEsj5NDaBwASNeHOI/ZY003s8amltKdenpx6oOhIzFZCihAtztZRHcw9nK7VUZlIpK22hzcQpR9bQTEvlPCXYffnMYZS16h3MeSVInpZQUavMG2pTlzJPoSYmg6lalBKkE9AoExUpPF5LgTOywy8Cpom48wYdTdAkZ5oTdKWllxQzJUg+BXpy9ISt1jdj/AFSxLabc/lEIX0zJBhqZ2Rl7j2mVasbEBaR+EQmH6vMioKplTzF0aIUrjca2J56cDElP0Knzq1LW0W3SblbRyknqeRiWtvKtY6yobU5uRqWHSiVWXZuUcEy04gaIt72p6j8BCFI2fYkrNAkKzSnJCoS84yHkoS9kcHVJCgBcEEceUWCYwa08lTaJxwJWCkhaAeOnK0THweqnlwGZLMlLslNPsoKkgiwOa3b3iY7GCxDJRIU7H7zmY2gjVAbXuPtMqq8hUqK6lqt02bkFXsC6ghKvJXA+hhhs2UDtEkik3Bce1/uKj1wsofZVK1BluZYcAzh6y21A9rR5Yw0yzL7Y32ZZtLTDU9NobQnglI3gAHpHQGIatRcNyE5/BFN1I6y8bET/AL1cZ9cjn68RusYVsQ/nYxn9W5+vEbqbQvW3HYfaFp7HuYQiEz86FVQmYDCiGToYUTxMERCieESVMN+E9/KYV+te/FuM42w/84p/srf6So0f4T58eFPrXvxbjOtrJ/21av8A0DX6aoeoedOxi7+Ru4lswZsxreJA1MzY+KqavUOvJu44PoI4+psPOLxsrLVFmMUYYWs76Smy80pWhcQQAFefhSfWNUmFLKrfJWACkZlZSCP2RlW0ClTcjX0Ymobe8m202mZdKr75vmBbiR+FukJ1qzVDZjGKVMLtNNaeLozPOsjMjLoqxSq99QYreLsF0DFucVyTU1NjwGclzu1q6AngodlAwjhnEsniGXM5JutJVkAcacSDlUOSh809+EWJM0hbakkrU46kBKd2EpBHCxvaAq5B00hCsymb2KzkjdVCxg4yhQyhE3KhdxyGZJ/ZCUtgjaDh5suU5OHKufyhdt4j85YAH2xrriktrKiBLurTpkUDZQ7DkY5krKWnLe0bwZgrMQpJHEWvxjfEDbqDK8QGjGZdStos3hmaLON8N1ikhyyVTRG/Y9CkWA8rxYcU1ylYopLbUjjGnyFFmEqROlGXfvNnihC1KG7uLgnKTY6Wi8CYSZd1AKZhtY1RkJHkQeUZpjXYxhzEl5uiobo9SN1WbRdhwjkpHLzTbyMFpmnfTT3g3znU6yLrG0bD9J3lK2Y0mVnq06gNB2Tl0pbbA0BccAGa3c26mI3BlJYpK5kTs4JrEk4rfTj6rlSlHWyCRqB957Whihc7gh4U/EdKZpySbImZZsezPd7pHH7+wguLqrKLpaamySky9rutqBzJ5WPUG1vOFMTUqN8tRofeN4Wmg8ZO3tJaozVZpCw6663OShNsymwkjsbcPPhAz1UYq1GW3LkhbgKVoPFBsdPvinfGOKcQyIW5OUykSbyPC3MAuOLT+UQAbX48oLIUrEtMUXpNVLrbdvE3LultzTok21+2ALhip8wuOV4yawYXym3W0W2fYoclMHyUmzLIUuWLjSlLUbA5ybWHnFllcXELHtcukI/KaXqPQxT8AV6k0XFNVaxNT102TnDvpczrShuHb+JPDgbnW3zRGtoapFWYzUyap80lQuEJcQsH7NRBMVh2zl7aHWDw+Ip5Ap3Gkin5am1uVDqQld+DqNFpPQ/uMMcOy07S6k7JvArlXUlaHEjw5h+Btyhy03L0mZeQ3Iuy612zIucunMDh6iBmK22y2VLDbSfynXAkQkEOwjZew9I6nac3MVCTnE2S6wu5P5SddP8APeEpupJRNS8oyc777mRNuXNR9Bck8ops/jcTj65OiNuVWbA1RL+FpHdbh0AiewXKNoLs5PTzM9WHUZF7sENy7d77ttJ1tfirio25AQQ0Sq5n09OcEKoc2TWTL9cp7TpbM22HEm2lyAfPhFd2MOolMJ1SdfcQzLrqTy861BKUiydbmIbaOmWpkq/MSNmwE5VIHALPC37RFq2ObN3piiSUxi9KlSTXykrTVGycyzmK3BzJuNPt6Q3hafyWPUj2i2JcB1A5AzS8HYhYxElwyrbz7KBkMyGillevBKja58riPOlAGTbRNJF9KhOD9ZHqmUcTkabYS0yy25kAFgAlOgAHKPK9FP8AvrnDx/1hOf4kPUAOFUt0iFQ+Ne8umw832rYy+rc/XiN2MYTsN12qYy+rc/XiN3MVV3HYfaSnse5hFDSEzCijxhIwKEEUTxhRMJp0hRESVMM+E9/KYUPR178W4zrawM2NGuV2Ghf+8qNG+E8bKwr9c9/hxnG1lQTjBsqIAEu1f/uVDtHzp2MXbyv3E9TNTkvMKMlUVNh9BypdTYpUR0PI9oWnpRxbW7WlooGocbbsoeYEMkbqpyaSwGmKOkBe9FvlR1SeQ7wSUM2wh5+Sf3VPTqhM2bhQ7cwOkc0ncRxRzlKruE2JiaVN059yl1MG/tEuMoX+cnn5/jDBmp4sooy1KRZq8qni9JnK5bqUf+PWNJdnkvSzblUpyghVglxBv/5hMSMrOhSqfMpWocUL0UP2xm52Os3eVvDONKdUng1KPqlZvgthacjh/unQ+kWhmZB8bm8U7msl1KwkX5XBsB6xUcUYVlKoCmoMFuZTq3MI0cSeRB5+RiHoFbn6JUUUfEroWV/8JPnRD4B0Sv6Xn68ia7SEXmmjeIzrdtLvlYUlaSClQNrjv1tDlLvypN1iYaNlpy3Ch6dYi5VxkpUFssZSdQsWKO9xrb8Ic51NBWd1BdKkFlxKr34Ai/lGgekyRHg9ln5Myk+hqYaduhbTyQoHoCDGL7bNmtHpOEZ+q4fZmZVxopcclGnCplSQrxHKdRYa6G2hjZX1b1LryLB5rwuNqFx/nmDArR7fKvS85uSCLFI4pPcHiPxg1NyDBlQRPLdPn0TEs2tBGRSQQR+ESEu2p95pDR+UWoISQeZNh+MTeLtlU7RZl2awm42WFkqMg8fAo/1a+XkbW6xTKbWV0avyXx7KTVKdamEKJebOWwUNQef3ws+GJN01HvOlTxa5bNofaeq5ajyaaJL0ycYanZZpsIKZhAcCiOJOa+pN483Vmg4aYrk2xNUMN+zzC21Kk5hTVwlRGnTSNkVtDp0vSnZ5qpyM+22LpS26krWrkLA318ow52oPT0w6662VPvuFasp4qUST95i6juoGUkQOGoq5YuARL4vZhhGZYzSz+IU50XbvP3SLi45cIo7FCw9T58F+hqni2opWidmlrGhsdARrGkS1U9lk2GQwfkm0pJK9NBryjMapVlOTk1MZW20OOKWMx4Am8CFes+0LTw9Jb3msolpB2jiVl5SVYpq0haWmGktIHMKsOfc6xmM5NLpNSdDLoCpdZG+vYWHP7I4Y2k2pKUkm3X6lOhASmVlElZv06fjEthbZtWcXzZnMTj4rpWbOqVSr5RfZR+b+PYcY1Tw7sc1XQeu8o4inSBVNe0QwNQ3doWLG5pxJ/gtSnd4pagbTTo1sOoHPt3OnonMV+zezsndpTvDmVlFyNNevEwykZGSoskKTTW2ZSVaaShtKU9b3IA46fjBFhp1WUKe3DaVZnHFHUpHADkOEMOwFlUaCI6sSzbmctKHGVltltppsBWf3iu6rcTy4x5noVhtlmwm2X4wnLW6fKR6IqFSRLs76cSGZZttN94sJSkJ+cr7Y83YUmG5vaqqYl1ZmXZuZWhVrXBCyNIPhzenU7QdUWde80HYZ/OnjH6tz9eI3Y8zGEbC/50sY2/o3P14jeORi6u47D7TNPY9zEyeOkEPeDmE7wKEEMDCiTCQI4woiJJMP+FB72Fbf0r3+HGabWhmxWAf+mb/SVGlfCf44U+tf/wAOM12rq/2rT/Zm/wBJUPYf9ROx/EWqeR+4j/C+MKxQN3LSb++ks4UZN/xNE+V7j0IjUqZtfpU7NNHEUpMSSW0gpS0N83m/KI0VbpoYw2XV8qVfkpUr7jHFC3GELSlaig7s2F+4/aIYq4Km5uNIGniXXQ6z1JRMT0ith2oS8/Lza2zlZlUK+URyBKDrc9bQ8mZQmz8wpz40eN2kMG2Tt3HUmPKjSvZFpcQ4tM0ggpU2rKWyPpDW/lwjUcFbV3pKYXK4jtMOKSltufV7zfTeDmnqRr1vHOr4J6eu4jtLEq+g0M2dt7en2GqpRv7ApWk6L7joYrmKMONVGUdkJ1lbrK/EhxCdUnkodCPviZS226W2ZUomnXCh92aJzC3EEEdeVocYmxPSMNMMvV2fbkmn1lDalpUcygLkeEHlCqqXNhvDFskzvC05WaZURQ6zLzTymx/FJ9LKlIcTySo20Pn5HkTeZNJyFlyTT4j4V5SgpPnb8YjBtVwUB/zHLD+47/8AzEtQ8b4arrwYpVdkZh9Wga3mRavJKrE+kEOHYa2P0mOMu148b36S8+WimZSpIUkDRxNgD+/tDl1hE8pLwGXw28adQQdLjnD7rDeoT0rTpRyaqEyzLSzYut15YSlI7kxQXlJm5xg2pRbU2qSaQlZ8WbNlURpwtpCFSw1KzkupopbLSh4mXkBxB9DFcf2xYJZfLfxuty3z2pV1SfttFpw3iajYkYW7Q6jLziUe+EGykfnJNiPURo0XUXIMyKgOgMzuq7GaDNuKc+KW2nD8+TeU193D7ohFbFJVpQVJztdlVDUFDiVW8jaNjxFX6Zh2QE7W5xEpKlYaDi0kjMb2GgJ5GEcM4pouJm5hdBqDU6mXKUulCVDKTcj3gOhjQ4gFwTaTMt7W1mRt7GVOEh+t4idQdCkuJSD90SdN2H0JpYXMsTEyf/dzSlD/ALU2i6VDaVhCnz8xJTtdlmZqXcLTrakOEoUDYg2TaEBtWwRoP4Ryn/Y4P/jGwtX1+kounpJGgYMotEATJykuxfTKy0EA+ZGp9TEk4XnmQ000kDeAhJGVKUA6A+doNRK3S65LGYo9QlZ1kaFTDgVl8xxHrC0+neNJQVBKSoZlHkNbwBgRe82pvGZfeEwJdBbC3F5XHUXJBOtr9bD0iMmZhrcoQQoMMqX4r2CtTrfpYQZbzapNLaN422halZgPfJvYA+UZzi+dnK5Oqw9R3Nbfx58cGkfkDueY9OsBuTDKohHi9jiqqSla0YalXPFYm824Dwv+SPu8zpmWF20NbWnG2kJbbRNzSUoSLBIAWABG8USWalKVLolm93KMNp0+/wBST95jCcOZhtcfziyxOTVx0PjhrDNenUt0gK4s695fNhX86WMPq3P14jeFGMF2FH/eli/6tz9eI3k8LxuruOw+0HT2PcxM8TCZhRX3wmekChRDJhRJ0hNJgwiSpiHwn+OFfrXv8OMy2rG+Kkn/ANs3+kqNN+E6NcK3/pX/APDjNNrDTgxEh4trDKmEIS4UnKVAquL9dYdoEcSn2P4i9TyP3EYSzKltTC0pOVKQCo6AXI4mJqj15MhTJmmoaDiZi4LxOWxULcOkViTn1FCm0uFAVqpB4K/fDhKUODQhtfQnwn90dRqYqCx2iCuUN1im6ucqLkXykc08tRHOq+XcUPyjb7YWTffNOruhaTZy/UC4PqBCUo2qcdQjRGYgFw6JHnG7i2syPSabsZx4qizzVFqRU5T5pwIaVa5YcJsP7pPEcuI5xO/Cj/8AQKD1E64P/wBcZNQ2NxiSnBLzKiidZF0r4/KJ4Rq3wojehUP+3O/q45hpLTrrl2MdFQvSN9xKNsr2YNY3o03PvVZ2S3EzuMiGA5m8IVe5I6wntG2UVHCMh8ZS00mo01CgHHA3kcZJNgVJudL2FwdDaNG+DIbYNq3/AOQP6tEaNjBhqcwnWpd8AtOSTyVX/MJ/ERl8Q6Vit9JpaStTvzmdfB+x1NVqWmqDWH1Pzko2HZd5Zupxq9ilR5lJI142PaM++EJiOaqONpqluOKFPpYShDV9CspClLI5nWw6Ad4jdhEwtraXRspNnUutr7gtKJ+8CL3tu2bVOp1p7ENBYM2HkJ9qlkfygUkWzpHzgQBcDXTneCWSlX15iYuz09IrQNg8jNUKWmKnWZxM6+0l0iXQjdt5hcDUXVa/G4jPE0LFOBsarVS5Offdp73hmJeWcU2+3obaDVKk6EdfKFMObUMV4WQ3Tt+HpeXAQmVn2SVIA+aDosD1jWsCba6fW5xin1iWVS5t1QQ24HM7C1HgLmxSSetx3imNZbk+ISLkNgNDDfCPc3uzeWcSCkLnmFAEWIulZsYhfgsn+IYk+uY/RXE18JI32fNX/wCvZ/BcQXwXDaRxL9ax+iuBj/zHvNn9YTKMfo3u0fELZJAXU3Uk9LuW/bGuvfB8kghe7xHNhYvlzyqCL97G8ZDj9zd7Rq+5a+Spuqt1s5f9kai98IJakrLeGwFG9s85cX72RDD8TKvDgUyAnPMvl5qq7Pcbvbt7JOU2YLbuQnI8gHVJ6pUnrwv1EeuKu605TULJXkWUqTl4m4uBHlTD1Gq+0rGbzzjaimZf307MhFm2Uk6i/W2gHHh5x6Rx/T3ajh5MnKTTkogvNha2/e3YvdI89IVxxGgO/OMYQHU8pSMTYmnJ2aVSsOrU/N8HZkatyqeeo59xw7nhM4MpUpT5ZMpLPBxV87zqj43FdSOPl0hWh02QpUoiVlUBhq97DxLcV16qP3CJlyUVNNpT7M0y2OCnUhbnoOA9THILclnSHrCSYQ+GJNBBblnFFzL9FRyD14+keeKHptfmgTr7dN/4ka1XsU0LADj6ZmadnKgseGTZtnSL38R4J8zr0BjGcEvv1XaJ8Zpl1hDj70w7kBUlrOFkAnzIHeH8MjJRcuLXETrMGqKqm9jNE2FEf6UsYj+rc/XiN3JtpGDbC1X2p4wtx3Tn68RvB46xqtuOw+0zS2Pcwp4wQ+cHPaCHSFzCwQddIMDCQMGBiCSVHafgGXx1TpZtc47KTkmVql3AMyLqtcLTxI8I1BuO8YbWmsS4KtTsXU8T1IcORD994hY+is8/oqsY9Rpgs1LMTkq7LzjDUxLujKtp1AUlQ6EHQwZagtlYXHuO0GVIN1NjPJMxhiQq0subwvNJUoark3VWUnsCdR66d4rC3JmRfXLzjTiHEaFCxZQjecZbEUpeVU8DTZkZpPiEm44Qi/RtfFPkq47iM4nqllmTRtoFJcl5prQP5Mi0fS05d03B6Q7SrunlOZfcfvF3pI2+h9v9SCo9Rbaz5gXEEWy31T/4hJTqlk5tRyHIeUPKvhGYlmfbqK8KjIkXC2tVpHcDj6fZEGxO/NdH94Q/RrU6gupitSmyaMJP4dN6/TP7Wz+sTGu/CeP+pKJ/bXf1cZBhshVcpZSQR7WzqPrEx6C2y4OqOMadT5elOSqHJaZW6v2hZSCCm2lgdYVxThayknSHoKTSYCVz4OM/KSmEamiam5ZhRnyQl11KCRu0a2JiT2vbQKXIYZnqZTJ9iaqk42WAlhYWGUq0UpRGg0uAONzGdf6DMTE3VMUc+byj/wDCJah7Bp1TyTW6vLMsA3KJNBWsjoCoADzsYAwompxC0IpqZMgWR/wdKG5OYteq6kESlPZUkKtoXViwA8k5j9kWDE22ar0PFU/SX6PIFqUmi0pedzOpAOigL2uU2PrGuYdoshh+lNU6lS4YlW9Qm9yonipR5k8zFN2lbMZPFzvt8q+JGrpQEF0pzIeA4BYGtxwChrbrAf4inVqEuNIThOlOynWW9xuiYmpiH3GpCqSLqcyVuJS4LeZ1B+wiPJ20GUpVPxhVpbD7ocprblmyleYJOUZkpVzAVcA9otTmxjGDTikNIp7iCdVtzgSFeYIB+6LdgjYkZWeZnMUzTDyGlBaZOXuUqI1GdRA07Aa9YPTanQuwe/pBMHqWGW0kdty3nNkVIXNX9oU7KKcvxzFpV7+sMfgwm0hiT65j9FcXbazhiexbhhFOpi5dD6Zpt4l9ZSnKkKB1AOuoiO2N4LqeDZWrN1ZyVWZpxtTfs6yrRIUDe4HWAcVeAVvreF4bcUHlMGxwAvaTXEqF0qqjgIPMbyNw2mbNaK/hKfXh6kSslUJUe0NmXRYuBN8yO9039QIqmIdkVfqOL6jVGJimpl5ieVMoCnlBWUrvqMvG0bupQJUepvG6+JAyFDtM0qJOYMJ5x+D7in4qxIqjTDlpKqWDdzol8Dwn+8Lp/wC2PQtUaEzK7srUkZgbp4xhGKdkFTl65P1GjT1Nk6Wl32lpb75bLGubXw2ASeBv0h/ivbUGKY1KUdtiZqgQkTE5qZdLlvEWwbFYvqCbDzjOIpiuQ1PW+8ui/BBDcppdWqdFwtIKm6lMMybR0ClHM46eiR7yj5RimMNr9WrTqpDCzL0hLrOUOJGaZd8rXyelz3EVyWodcxbMrq2Ip1xlgi6pubOuX6CTYBP2Dzh7L1eRpj6aXganrqFSe8HtJQXFuH6IGpH2J84qnSp0jZBmb2Heaeo7i7HKvuYhIYQl5Jj4yxnPeytKOb2cLzOuHudTfsLnqRElTJyt4neNG2e0kycig2W8kBOQdVr4I+9Ri4YS2LzlTmU1TH844t1Vj7E05dVui1jRI+ij7Y2qm0+TpUi1J0yVZlJRoWQ00nKkenXudYjuL3c5j7D95SqbWXQe5lH2W7NmsErmJ2Yn3J2rTTW6eWNGkpzBVkg6k3HvH7BF/J4xxgmusLu5c3MKqhRYQbwQm/eOMEOnCMTUG3CDJ0ME5GBB5CKlkRUG0GSYSBgyTG5mLAxFYlw5ScTSBlK5JNTTQ9xR0W2eqFDVJ8okgdIMDpFglTcSiL6GeeMSbLsSYMfcqGDplypU/wB5cuUgvJH0kcFjumyu0VH2mhYoUUTyBSauTl3g0QtXQ359jY949bg84pOPdmdBxglb0yyZOpkWE7LgBR/PTwWPPXvB1qKxudG6j89YPIVFhqOhnmafpVVwnUGJpbaVNtOpcQ8m6m1FJBF+nDgY3rAu2CkYhWiVquWlVJWgDivkXD9FZ4Hsr7TGZV6jYs2dkt1RlNWoBOUPAFTeXoSdWz2Vp0iHdoVFxCyp/Db6ZabtmXJPGw9Og8rjygrkOPnbf3D8jlMIMp+X9DPWGYwBMeW8LbQcTYHmESE8lczIo/8As5onwp6tr1IH2p7RvOC8c0XFzP8AqyYKJwC7km9ZLqfIfOHcX9ITqYZkGYajrD06ytpsZa8/eOCtYZTs2mSYDjiHFpKgmyBc6xyFzD6ApotstnUKJzqPoNB9pha/KHtHRfb3waLiA4RcIuLkeUKXiDdpzaqy06Xny6WysrzC9wQBy00PCH+aaYuVKbfbGtz8moD8D90UCZLR7fSCg3EM5CfRO77IhxG7NvGLXv0iLxZi6j4TlA9WZsIWoXbl0DM67+anp3Nh3jaAubLrKJCi5lg+8xn+OtqVFwzvJeXWKlU06ezsL8KD9NfAeQufKMjxdtQxDjGYVTqI07ISTmm4lyS86n6axwHUCw6kxFymGqZQGETWLZlJWrVuRZNyrztqfSw7w6uHSnbim56DeLGqzeTbrD1OtYp2jzpQ8tRlEquGkAtyzPn+UfO5hZScO4P1eKavWUfN0DbSu/ED1uewiQpDGJ8f/wASwrJJptFbORb/APJtpHQrA1P0UDzjYdn2yahYUDc1MITVKqnX2l9AyNn+rRwHmbnuIKzG1n8I6D8mDUC911PU/gTMaBgHFe0JxucxA+qkUQnMhCkEKWOqGzqfzl+l43HCGD6LhGT3FFk0trULOTC/E87+cvjbsLDtFhUom54kwmVXgDVSRZRYdIRUsbnUzlGCkwBMANRAoSdAE2EAowQqMZlicTc3gI7hARkmaGkQ3hgQ73iPS93gd6RzixJJEOiBDtojt9Bt7pxjczJEPd4FL3UxHB3vAh23AxJUk99Bg73iLS73hQPdTElR+taVoUhwJUhQyqSoXCh0I5iMkxxsap1ScVP4VdTSagDnDIuGFntbVs+WnYRpodHWDB3vG6dRk2Myyht55kqNRnqQ8KJj+lLWn5jyk+K35SSNFDuk3iNnMLKCE1LC06ZtlKsyQ2vK80exFtfsMenq1TqfWpFcnVpNmbllfMdTex6g8Qe41jGcT7KapQphdSwNNvPJ4qk3FDeW6AnRwdjr5wxTcXuhsenI/tBlTbxa/eIYJ20z1PWmRxY05OMoOX2pCbPt/np0C/uV5xsdIqclWZT4woE8y8ws65DdBPRSeKVfYfOPN7lSplccVK4mlFU2qNnIZgJKCD0UDqPJVx3ENzJ1/Bc4KlR5pzdf9RL6pUno4nUEedx3jNSjTqmxGVvY9ppHZBceIe89Re2fx1vOy4Hg0pOQC99U6hXC2nGEqhNy8jKuT1bm2GJVrU7xWVpHmT7x/wAgRjEvtxeFEUH6ShdWGiVIXZhX0iPeH5o+0RRnXMS49nhM1GZW4wknK44MjLXUISP2epgQwRXxVTYTZxAbRBczQcbbbnXc8phFotpPhM8+i6j9W2eHmrXtFDksNT1SW5V8UTrktLrOdx6ZXd5z/u4evoIW9soeGFJbpbXxrVr5d8oXSlXRNufZOveLXhrZnX8WTDc/jOaekJG+ZEqBZ0jsng2O5urtDKnKvy/CvU7nsIEi5u2p6cpASlWU7MCi7PKS45MOaF4N5nF/S14D6StOwjRMGbF2A+KljmaNRnV2UZRCyWwfpr4r8hYecaLhuiUvDcj7JRZNqUZ+dl1U4eq1HVR84lC7ccYBxQtwn15mbClvN9OUdSqWpWXbl5VptlhsZUNtpCUpHQAaCDl6GJd0gu96GA77zcfF7WC77jrDEvd4IXT1iTUf73vAb6GG97x29iS49LxuYLvIZF7SA3sZliPS73gu94w1KlBCVHgrgesELveKtLjHedzHb254wy3l+cAHLHjFyo/3kGDveGId7x2976xqVJDexwdhiHb8Y7e6d4kqSAd484FLvUxHpcjg7x1iSSS33eDB68Rgd7wcPacYkkkS7HB2I8PdTHB4dYkqRmL8IUXFbJFUl7TSU2bmmjldR68x2NxGOVnDOKMBKW9JKNUog1UUpJCR9JHFHmLiN3DveODsFWqQMraiYKa3Ghnm5uo4TePxk/JuImB70oPdUrrb3SO+g6iJWlUfE+PikSjYptCvl3qrpby9raueQsnyjUprAmGZmtiqO0tovjVTYNmlq/KU3wJ+7qDFqQ6EpCRokCwA0AHSNZ0XVbk+utu0rKx0Og9OcgcEYFomE0pclGjMVADWcfAK/wC6OCB5a9zFt33eGO942MF3veAsxY3M2FAFhJDe9Y4vacYj973gN93ipcfl7SCF3vDHfd4LvYkuPy5fnAFzWGBd4wO9iSR6HIAuaWvDLewBd7xJYj3e94M0+lKwVpzJ6E2vEfve8dvepiS7yxTU6wZVFkhWb3U8LREl2GJeHWODveKJvIBaf//Z" align="right" height="120" alt="DSIR logo" /></p>
+<p>DSIR is a small R package for global health data work. It consists of
+WHO Member State metadata, lightweight clients for the GHO and UN SDG
+APIs, and reusable WHO-style <code>ggplot2</code> and
+<code>flextable</code> themes. DSIR is designed for health
+professionals, WHO staff, and global health researchers — the kind of
+users who do the same routine tasks every day.</p>
+<p>This vignette walks through the typical workflow: looking up
+countries, fetching data from GHO and SDG, cleaning the raw response,
+and producing publication-style charts and tables.</p>
+<div id="who-member-state-metadata" class="section level2">
+<h2>WHO Member State metadata</h2>
+<p>The <code>who_countries</code> tibble lists all 194 WHO Member States
+with their ISO3, ISO2, UN M49 codes, official names, short names, and
+WHO region. For Western Pacific countries, an extra column
+<code>is_pic</code> identifies the 14 Pacific Island Countries.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>who_countries</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; # A tibble: 194 × 7</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt;    iso3  iso2  m49_code name_official       name_short         who_region is_pic</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;              &lt;chr&gt;      &lt;lgl&gt; </span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;  1 AFG   AF    004      Afghanistan         Afghanistan        EMR        FALSE </span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;  2 ALB   AL    008      Albania             Albania            EUR        FALSE </span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;  3 DZA   DZ    012      Algeria             Algeria            AFR        FALSE </span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;  4 AND   AD    020      Andorra             Andorra            EUR        FALSE </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;  5 AGO   AO    024      Angola              Angola             AFR        FALSE </span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;  6 ATG   AG    028      Antigua and Barbuda Antigua and Barbu… AMR        FALSE </span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;  7 ARG   AR    032      Argentina           Argentina          AMR        FALSE </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt;  8 ARM   AM    051      Armenia             Armenia            EUR        FALSE </span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;  9 AUS   AU    036      Australia           Australia          WPR        FALSE </span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; 10 AUT   AT    040      Austria             Austria            EUR        FALSE </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; # ℹ 184 more rows</span></span></code></pre></div>
+<p>For convenience, DSIR offers pre-defined vectors of ISO3 codes for
+each WHO region.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>wpro_cty</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;AUS&quot; &quot;BRN&quot; &quot;CHN&quot; &quot;COK&quot; &quot;FJI&quot; &quot;FSM&quot; &quot;IDN&quot; &quot;JPN&quot; &quot;KHM&quot; &quot;KIR&quot; &quot;KOR&quot; &quot;LAO&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; [13] &quot;MHL&quot; &quot;MNG&quot; &quot;MYS&quot; &quot;NIU&quot; &quot;NRU&quot; &quot;NZL&quot; &quot;PHL&quot; &quot;PLW&quot; &quot;PNG&quot; &quot;SGP&quot; &quot;SLB&quot; &quot;TON&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; [25] &quot;TUV&quot; &quot;VNM&quot; &quot;VUT&quot; &quot;WSM&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">length</span>(wpro_cty)   <span class="co"># 28 Member States in WPR (since May 2025)</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; [1] 28</span></span></code></pre></div>
+<p>The <code>is_pic</code> flag is useful because Pacific Island
+Countries are often analysed as a group, given their distinct
+demographic and geographic profiles.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>who_countries <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">filter</span>(is_pic) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">select</span>(iso3, name_short)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 14 × 2</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;    iso3  name_short      </span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt;           </span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;  1 COK   Cook Islands    </span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;  2 FJI   Fiji            </span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;  3 KIR   Kiribati        </span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;  4 MHL   Marshall Islands</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;  5 FSM   Micronesia      </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;  6 NRU   Nauru           </span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;  7 NIU   Niue            </span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;  8 PLW   Palau           </span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;  9 PNG   Papua New Guinea</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; 10 WSM   Samoa           </span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; 11 SLB   Solomon Islands </span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; 12 TON   Tonga           </span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; 13 TUV   Tuvalu          </span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; 14 VUT   Vanuatu</span></span></code></pre></div>
+<p>When you have a vector of ISO3 codes and need to know which WHO
+region each belongs to, <code>iso3_to_region()</code> provides the
+lookup. It is vectorised and returns <code>NA</code> for codes that do
+not match a WHO Member State.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">iso3_to_region</span>(<span class="fu">c</span>(<span class="st">&quot;PHL&quot;</span>, <span class="st">&quot;FRA&quot;</span>, <span class="st">&quot;ZAF&quot;</span>, <span class="st">&quot;USA&quot;</span>, <span class="st">&quot;XYZ&quot;</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;WPR&quot; &quot;EUR&quot; &quot;AFR&quot; &quot;AMR&quot; NA</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co"># &quot;WPR&quot; &quot;EUR&quot; &quot;AFR&quot; &quot;AMR&quot; NA</span></span></code></pre></div>
+<p>This is convenient when joining external datasets (which often arrive
+keyed only by ISO3) to the WHO regional structure.</p>
+<p>The companion helper <code>iso3_to_m49()</code> converts ISO3 codes
+to UN M49 numeric codes — useful because the WHO GHO API is keyed by
+ISO3 (<code>&quot;PHL&quot;</code>) while the UN SDG API is keyed by M49
+(<code>&quot;608&quot;</code>). The M49 values are returned as three-character
+zero-padded strings, exactly as stored in
+<code>who_countries$m49_code</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">iso3_to_m49</span>(<span class="fu">c</span>(<span class="st">&quot;PHL&quot;</span>, <span class="st">&quot;FRA&quot;</span>, <span class="st">&quot;JPN&quot;</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;608&quot; &quot;250&quot; &quot;392&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># &quot;608&quot; &quot;250&quot; &quot;392&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co"># Case-insensitive; non-Member areas return NA</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="fu">iso3_to_m49</span>(<span class="fu">c</span>(<span class="st">&quot;phl&quot;</span>, <span class="st">&quot;PRI&quot;</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;608&quot; NA</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co"># &quot;608&quot; NA</span></span></code></pre></div>
+<p>In practice you can usually skip the explicit conversion:
+<code>sdg_data()</code> and <code>sdg_coverage()</code> accept ISO3
+codes for their <code>area</code> argument and do the lookup internally
+(see the SDG section below).</p>
+</div>
+<div id="checking-availability-before-fetching" class="section level2">
+<h2>Checking availability before fetching</h2>
+<p>GHO has thousands of indicators, but any single indicator may not
+cover the countries or years you need. Before issuing a full download
+with <code>gho_data()</code>, three lightweight helpers let you ask the
+server what is available without transferring any observations.</p>
+<p><code>gho_has_data()</code> is a quick yes / no for a given indicator
+and filter — useful when screening a list of candidate indicators.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Does WHO have life-expectancy data for France?</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">gho_has_data</span>(<span class="st">&quot;WHOSIS_000001&quot;</span>, <span class="at">area =</span> <span class="st">&quot;FRA&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; Assuming `spatial_type` = &quot;country&quot; since `area` was given.</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; ℹ Pass `spatial_type` explicitly to silence this message.</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/WHOSIS_000001?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27FRA%27%29&amp;$top=1&amp;$select=Id&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co"># TRUE</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co"># Bulk-screen several indicators at once</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>inds <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;WHOSIS_000001&quot;</span>, <span class="st">&quot;NCDMORT3070&quot;</span>, <span class="st">&quot;MDG_0000000026&quot;</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="fu">vapply</span>(inds, gho_has_data, <span class="fu">logical</span>(<span class="dv">1</span>), <span class="at">area =</span> <span class="st">&quot;PHL&quot;</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; Assuming `spatial_type` = &quot;country&quot; since `area` was given.</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; ℹ Pass `spatial_type` explicitly to silence this message.</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/WHOSIS_000001?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27PHL%27%29&amp;$top=1&amp;$select=Id&gt;</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; Assuming `spatial_type` = &quot;country&quot; since `area` was given.</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; ℹ Pass `spatial_type` explicitly to silence this message.</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/NCDMORT3070?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27PHL%27%29&amp;$top=1&amp;$select=Id&gt;</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; Assuming `spatial_type` = &quot;country&quot; since `area` was given.</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; ℹ Pass `spatial_type` explicitly to silence this message.</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/MDG_0000000026?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27PHL%27%29&amp;$top=1&amp;$select=Id&gt;</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;  WHOSIS_000001    NCDMORT3070 MDG_0000000026 </span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;           TRUE           TRUE           TRUE</span></span></code></pre></div>
+<p>It returns <code>TRUE</code>, <code>FALSE</code>, or <code>NA</code>
+(for request failures, including a non-existent indicator code — GHO
+returns HTTP 404 in that case).</p>
+<p><code>gho_count()</code> returns the number of rows the same filter
+would produce, which is useful for sizing a download.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">gho_count</span>(<span class="st">&quot;WHOSIS_000001&quot;</span>, <span class="at">area =</span> wpro_cty)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; Assuming `spatial_type` = &quot;country&quot; since `area` was given.</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; ℹ Pass `spatial_type` explicitly to silence this message.</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/WHOSIS_000001?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27AUS%27%2C%27BRN%27%2C%27CHN%27%2C%27COK%27%2C%27FJI%27%2C%27FSM%27%2C%27IDN%27%2C%27JPN%27%2C%27KHM%27%2C%27KIR%27%2C%27KOR%27%2C%27LAO%27%2C%27MHL%27%2C%27MNG%27%2C%27MYS%27%2C%27NIU%27%2C%27NRU%27%2C%27NZL%27%2C%27PHL%27%2C%27PLW%27%2C%27PNG%27%2C%27SGP%27%2C%27SLB%27%2C%27TON%27%2C%27TUV%27%2C%27VNM%27%2C%27VUT%27%2C%27WSM%27%29&amp;$top=0&amp;$count=true&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] 1452</span></span></code></pre></div>
+<p><code>gho_coverage()</code> summarises year coverage and observation
+counts per country. The payload is small because only
+<code>SpatialDim</code> and <code>TimeDim</code> are requested from the
+server.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">gho_coverage</span>(<span class="st">&quot;WHOSIS_000001&quot;</span>, <span class="at">area =</span> <span class="fu">c</span>(<span class="st">&quot;FRA&quot;</span>, <span class="st">&quot;DEU&quot;</span>, <span class="st">&quot;JPN&quot;</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/WHOSIS_000001?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27FRA%27%2C%27DEU%27%2C%27JPN%27%29&amp;$select=SpatialDim,TimeDim&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 4</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt;   location year_min year_max n_obs</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;       &lt;int&gt;    &lt;int&gt; &lt;int&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; 1 DEU          2000     2021    66</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; 2 FRA          2000     2021    66</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt; 3 JPN          2000     2021    66</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt;   location year_min year_max n_obs</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; 1 DEU          2000     2021    66</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; 2 FRA          2000     2021    66</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; 3 JPN          2000     2021    66</span></span></code></pre></div>
+</div>
+<div id="fetching-indicator-data-from-gho" class="section level2">
+<h2>Fetching indicator data from GHO</h2>
+<p>To fetch indicators from GHO, the typical workflow is three steps:
+search for the indicator code, fetch the data, then clean the response.
+The <code>area</code> argument accepts a long ISO3 vector, so a whole
+region can be pulled in one call.</p>
+<div id="step-1-search-for-an-indicator" class="section level3">
+<h3>Step 1: Search for an indicator</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">gho_indicators</span>(<span class="st">&quot;UHC&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/Indicator?$filter=contains%28tolower%28IndicatorName%29%2C%27uhc%27%29&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 3</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt;   IndicatorCode      IndicatorName                                      Language</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;                                              &lt;chr&gt;   </span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; 1 HSS_UHCLEGISLATION Countries that have passed legislation on Univers… EN      </span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; 2 GOE_Q070           Strategy includes objectives as to how telehealth… EN      </span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; 3 GOE_Q002           strategy refers to the use of ICT to support UHC   EN      </span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 4 GOE_Q004           National eHealth strategy refers to objectives of… EN      </span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 5 UHC_SCI_INFECT     UHC Service Coverage sub-index on infectious dise… EN      </span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 6 UHC_INDEX_REPORTED UHC Service Coverage Index (SDG 3.8.1)             EN</span></span></code></pre></div>
+<p>Pick an <code>IndicatorCode</code> from the result — this is the
+value you pass to <code>gho_data()</code> in the next step.</p>
+</div>
+<div id="step-2-fetch-the-data" class="section level3">
+<h3>Step 2: Fetch the data</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>uhc <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">indicator    =</span> <span class="st">&quot;UHC_INDEX_REPORTED&quot;</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">spatial_type =</span> <span class="st">&quot;country&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">area         =</span> wpro_cty,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">year_from    =</span> <span class="dv">2015</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/UHC_INDEX_REPORTED?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27AUS%27%2C%27BRN%27%2C%27CHN%27%2C%27COK%27%2C%27FJI%27%2C%27FSM%27%2C%27IDN%27%2C%27JPN%27%2C%27KHM%27%2C%27KIR%27%2C%27KOR%27%2C%27LAO%27%2C%27MHL%27%2C%27MNG%27%2C%27MYS%27%2C%27NIU%27%2C%27NRU%27%2C%27NZL%27%2C%27PHL%27%2C%27PLW%27%2C%27PNG%27%2C%27SGP%27%2C%27SLB%27%2C%27TON%27%2C%27TUV%27%2C%27VNM%27%2C%27VUT%27%2C%27WSM%27%29%20and%20TimeDim%20ge%202015&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>uhc <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; Rows: 252</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; Columns: 25</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; $ Id                 &lt;int&gt; 8863958, 8931286, 8931421, 8936824, 8953464, 897568…</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt; $ IndicatorCode      &lt;chr&gt; &quot;UHC_INDEX_REPORTED&quot;, &quot;UHC_INDEX_REPORTED&quot;, &quot;UHC_IN…</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt; $ SpatialDimType     &lt;chr&gt; &quot;COUNTRY&quot;, &quot;COUNTRY&quot;, &quot;COUNTRY&quot;, &quot;COUNTRY&quot;, &quot;COUNTR…</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt; $ SpatialDim         &lt;chr&gt; &quot;WSM&quot;, &quot;LAO&quot;, &quot;FJI&quot;, &quot;NIU&quot;, &quot;COK&quot;, &quot;TON&quot;, &quot;NZL&quot;, &quot;N…</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt; $ ParentLocationCode &lt;chr&gt; &quot;WPR&quot;, &quot;WPR&quot;, &quot;WPR&quot;, &quot;WPR&quot;, &quot;WPR&quot;, &quot;WPR&quot;, &quot;WPR&quot;, &quot;W…</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt; $ TimeDimType        &lt;chr&gt; &quot;YEAR&quot;, &quot;YEAR&quot;, &quot;YEAR&quot;, &quot;YEAR&quot;, &quot;YEAR&quot;, &quot;YEAR&quot;, &quot;YE…</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt; $ ParentLocation     &lt;chr&gt; &quot;Western Pacific&quot;, &quot;Western Pacific&quot;, &quot;Western Paci…</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt; $ Dim1Type           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt; $ TimeDim            &lt;int&gt; 2017, 2022, 2023, 2020, 2015, 2017, 2018, 2016, 201…</span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="co">#&gt; $ Dim1               &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="co">#&gt; $ Dim2Type           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a><span class="co">#&gt; $ Dim2               &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a><span class="co">#&gt; $ Dim3Type           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a><span class="co">#&gt; $ Dim3               &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a><span class="co">#&gt; $ DataSourceDimType  &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a><span class="co">#&gt; $ DataSourceDim      &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a><span class="co">#&gt; $ Value              &lt;chr&gt; &quot;62&quot;, &quot;62&quot;, &quot;69&quot;, &quot;69&quot;, &quot;74&quot;, &quot;69&quot;, &quot;89&quot;, &quot;58&quot;, &quot;77…</span></span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a><span class="co">#&gt; $ NumericValue       &lt;dbl&gt; 62, 62, 69, 69, 74, 69, 89, 58, 77, 28, 89, 69, 80,…</span></span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a><span class="co">#&gt; $ Low                &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a><span class="co">#&gt; $ High               &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a><span class="co">#&gt; $ Comments           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
+<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a><span class="co">#&gt; $ Date               &lt;chr&gt; &quot;2025-12-05T11:39:13.277+01:00&quot;, &quot;2025-12-05T11:39:…</span></span>
+<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a><span class="co">#&gt; $ TimeDimensionValue &lt;chr&gt; &quot;2017&quot;, &quot;2022&quot;, &quot;2023&quot;, &quot;2020&quot;, &quot;2015&quot;, &quot;2017&quot;, &quot;20…</span></span>
+<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a><span class="co">#&gt; $ TimeDimensionBegin &lt;chr&gt; &quot;2017-01-01T00:00:00+01:00&quot;, &quot;2022-01-01T00:00:00+0…</span></span>
+<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a><span class="co">#&gt; $ TimeDimensionEnd   &lt;chr&gt; &quot;2017-12-31T00:00:00+01:00&quot;, &quot;2022-12-31T00:00:00+0…</span></span></code></pre></div>
+<p>Note that <code>area</code> accepts long ISO3 vectors — here we fetch
+all 28 WPR countries in one call.</p>
+</div>
+<div id="step-3-clean-the-raw-response" class="section level3">
+<h3>Step 3: Clean the raw response</h3>
+<p><code>gho_clean()</code> produces the <strong>unified DSIR
+cleaned-indicator schema</strong> — the same 15-column shape as
+<code>sdg_clean()</code>. Columns include <code>source</code>
+(<code>&quot;gho&quot;</code>), <code>id</code>, <code>indicator</code>,
+<code>location</code>, <code>iso3</code>, <code>location_name</code>
+(empty for GHO), <code>year</code>, <code>value</code>,
+<code>value_num</code>, <code>low</code>, <code>high</code>,
+<code>series</code> (empty for GHO), and the three optional GHO
+dimensions <code>dim1</code>–<code>dim3</code>. Columns absent from the
+raw response are filled with typed <code>NA</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>uhc_clean <span class="ot">&lt;-</span> <span class="fu">gho_clean</span>(uhc)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; Fetching: &lt;https://ghoapi.azureedge.net/api/Indicator&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>uhc_clean</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 252 × 15</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt;    source id        indicator location iso3  location_name  year value value_num</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt;  1 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2015 89           89</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt;  2 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2016 89           89</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt;  3 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2017 89           89</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt;  4 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2018 89           89</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt;  5 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2019 89           89</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt;  6 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2020 89           89</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt;  7 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2021 89           89</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt;  8 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2022 89           89</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt;  9 gho    UHC_INDE… UHC Serv… AUS      AUS   Australia      2023 89           89</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; 10 gho    UHC_INDE… UHC Serv… BRN      BRN   Brunei Darus…  2015 84           84</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt; # ℹ 242 more rows</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; # ℹ 6 more variables: low &lt;dbl&gt;, high &lt;dbl&gt;, series &lt;chr&gt;, dim1 &lt;chr&gt;,</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; #   dim2 &lt;chr&gt;, dim3 &lt;chr&gt;</span></span></code></pre></div>
+</div>
+</div>
+<div id="aggregating-indicators-with-geomean" class="section level2">
+<h2>Aggregating indicators with geomean()</h2>
+<p>Some health indicators are constructed as the geometric mean of
+component values rather than the arithmetic mean. The UHC Service
+Coverage Index, for example, aggregates 14 tracer indicators using
+nested geometric means. DSIR provides <code>geomean()</code> for
+this:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Unweighted geometric mean</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">geomean</span>(<span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">0.8</span>, <span class="fl">0.95</span>))</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; [1] 0.7697002</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; 0.7720589</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co"># With optional weights — useful when tracers have different </span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co"># methodological importance</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="fu">geomean</span>(<span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">0.8</span>, <span class="fl">0.95</span>), <span class="at">w =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; [1] 0.7232343</span></span></code></pre></div>
+<p><code>geomean()</code> handles missing values, zeros, and negative
+values sensibly — see <code>?geomean</code> for details. It is a small
+helper, but it removes a common source of bugs when re-implementing
+index calculations from indicator components.</p>
+</div>
+<div id="plotting-with-theme_dsi-and-theme_dsi_facet" class="section level2">
+<h2>Plotting with theme_dsi() and theme_dsi_facet()</h2>
+<p>DSIR provides two paired <code>ggplot2</code> themes tuned for
+WHO-style charts — clean panels, modest grids, and a consistent accent
+colour. Use them as drop-in replacements for
+<code>theme_minimal()</code> and <code>theme_bw()</code> respectively
+whenever a chart is heading into a WHO deliverable.</p>
+<p>The rule of thumb is simple: <strong>single-panel plots use
+<code>theme_dsi()</code>, faceted plots use
+<code>theme_dsi_facet()</code></strong>. The two share typography, title
+treatment, and legend handling, but differ in how they frame the data —
+the facet variant adds panel borders, light strip backgrounds, and
+breathing room between panels, all of which would look heavy on a
+single-panel chart.</p>
+<div id="single-panel-theme_dsi" class="section level3">
+<h3>Single panel: <code>theme_dsi()</code></h3>
+<p><code>theme_dsi()</code> keeps the chart chrome minimal — a
+half-frame axis, light grid lines, and the WHO-blue accent on the axis
+line. By default the grid runs in both directions; pass
+<code>grid = &quot;y&quot;</code> for the minimalist horizontal-only look.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>uhc_clean <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="fu">filter</span>(iso3 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;AUS&quot;</span>, <span class="st">&quot;CHN&quot;</span>, <span class="st">&quot;PHL&quot;</span>, <span class="st">&quot;FJI&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="fu">left_join</span>(who_countries, <span class="at">by =</span> <span class="st">&quot;iso3&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> value_num, <span class="at">group =</span> iso3, <span class="at">color =</span> name_short)) <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.8</span>) <span class="sc">+</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  <span class="fu">theme_dsi</span>() <span class="sc">+</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;UHC Service Coverage Index, selected WPR Member States&quot;</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;2015 onwards&quot;</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;SCI&quot;</span>, <span class="at">color =</span> <span class="cn">NULL</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>  )</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>For bar charts, pair <code>theme_dsi()</code> with
+<code>scale_y_dsi_col()</code> (or <code>scale_x_dsi_col()</code> when
+<code>value</code> is mapped to <code>x</code>) — these are thin
+wrappers around <code>scale_*_continuous()</code> that remove the lower
+axis expansion, so columns sit flush with the axis instead of floating
+above it.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>uhc_clean <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="fu">left_join</span>(who_countries, <span class="at">by =</span> <span class="st">&quot;iso3&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(value_num)) <span class="sc">|&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="fu">reorder</span>(name_short, value_num), value_num)) <span class="sc">+</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#0093D5&quot;</span>) <span class="sc">+</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>  <span class="fu">scale_y_dsi_col</span>() <span class="sc">+</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>  <span class="fu">theme_dsi</span>(<span class="at">grid =</span> <span class="st">&quot;x&quot;</span>) <span class="sc">+</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;UHC Service Coverage Index, top 10 WPR Member States&quot;</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Latest available year&quot;</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;SCI&quot;</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>  )</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="faceted-theme_dsi_facet" class="section level3">
+<h3>Faceted: <code>theme_dsi_facet()</code></h3>
+<p>When the same chart is split across many small panels, the half-frame
+look becomes visually noisy — the accent-blue axis line repeats across
+every facet. <code>theme_dsi_facet()</code> switches to a full panel
+border, adds a light grey strip background to clearly mark each facet’s
+label, and introduces panel spacing so adjacent panels don’t run
+together.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>uhc_clean <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="fu">left_join</span>(who_countries, <span class="at">by =</span> <span class="st">&quot;iso3&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="fu">filter</span>(is_pic) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> value_num)) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">&quot;#0093D5&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&quot;#0093D5&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> name_short, <span class="at">ncol =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>  <span class="fu">theme_dsi_facet</span>() <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;UHC Service Coverage Index, Pacific Island Countries&quot;</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each panel shows one country&#39;s trajectory&quot;</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;SCI&quot;</span></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>  )</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>The <code>strip_fill</code> argument lets you change the strip
+background colour for emphasis — for example, a light-blue tone derived
+from the WHO accent for a deliverable where the strips themselves carry
+meaning:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>uhc_clean <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>  <span class="fu">left_join</span>(who_countries, <span class="at">by =</span> <span class="st">&quot;iso3&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>  <span class="fu">filter</span>(is_pic) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> value_num)) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">&quot;#0093D5&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> name_short, <span class="at">ncol =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="fu">theme_dsi_facet</span>(<span class="at">strip_fill =</span> <span class="st">&quot;#E5F4FB&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;UHC SCI, PIC — with custom strip colour&quot;</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;SCI&quot;</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAwAAAAHgCAMAAAAlhPoXAAACcFBMVEUAk9UZGUgZGXEZSEgZSHEZSJcZcboaGhozMzMzM1ozM30zM38zWFozWH0zWJ4zWlozWn8zWqAzen0zep4zer4zf8FIGRlISBlISEhISHFIcUhIcZdIcbpIl7pIl91NTU1NTW5NTY5Nbo5NbqtNjshVMzNVWDNVWFpVWH1Ven1Vep5Ver5Vm75Vm9xaMzNaWjNaWlpaWn9af8FaoOFuTU1uTW5uTY5ubk1ubqtujo5uq+RxGRlxSBlxSEhxcUhxl7pxl91xurpxut1xuv90MzN0WDN0WFp0WH10ejN0elp0en10m550m750m9x0uZ50udx0uft/MzN/WjN/Wlp/f39/weF/wf+OTU2OTW6Obk2OyP+SWDOSWFqSejOSelqSen2Sm1qSuX2Sub6SudyS176S19yS1/uXSBmXcRmXcUiXl7qXut2X3bqX3d2X3f+ZmZmgWjOgf3+gweGg4f+rbk2rbm6r5P+vejOvelqvm1qvm32vuX2vudyv156v176v19yv1/uv9L6v9Nyv9Pu6cRm6cUi6l0i6l3G63Ze63d263f+6/7q6/926///BfzPBf1rBwcHB///Ijk3Iq27I///Km1rKm33KuX3KuZ7K157K177K1/vK9L7K9NzK9PvMzMzdl0jdl3HdunHdupfd3brd3d3d3f/d/7rd/93d///hoFrhoH/hwX/hweHh4cHh4eHh4f/h/+Hh///kq27kq6vk5Kvk///luX3luZ7l157l177l19zl9L7l9Nzl9Pvr6+v/unH/wX//yI7/3Zf/3br/3d3/4aD/4eH/5Kv//7r//8H//8j//93//+H//+T///8dGeS5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO2djX8cx33eRdkh9miRTVKEUZrURwY4xrUC9022aTqtUwtME0Uy4dQNHSCmrbpB2jo13ZYClMROaJPOi5q0MUSYbC0DStU3uS95QQwYLHBiYdWBTQn3L3Vedvb9ZWb3t7sz2Of5fMg73D07++zsfHdmd+fuHplAUI/1SNcBIKhLAQCo1wIAUK8FAKBeCwBAvRYAgHotAAD1WgAA6rUAANRrAQCo1wIAUK8FAKBeCwBAvRYAgHotAAD1WgAA6rVSALwyNXVSPHnzV6dOfHYyeRD5e+op+ex3f3hqaurxD78WXe6Nf36Wvfgjn1F/R03f/eDUo38YWwsrVerxD70WeT+zZBOpkt74kNyUd1YrRixed8H0VpfIeAGovioA8J/O+o337Z8NF3ugXvw+2XhjpgIAxALq/cySjSRLevN3ROaqAPiL110QALggcwAibTfcXd8+G7wo2lzcVAgAW8B/P7NkM8mS/MxVAQg2ud6CAMAFGQPA9tLU239/Mvl/X56KtC+21KP/knluy7abMGUCILqKN36KP5HvZ5dcRXYAYCwA0IGMAXglGOW88iOfeS2ylGhrbB/yhRKmfAB41/HoH8r3s0sukL9SDs5J//Ef8JJu+0Mr/v6rjLAffTGy0Kt/b2rqhHjltlzcL4W/PvU2fkaiFufnNVP+0mzjH/2DL5+dOvHTk2+zEt/+YrzA2IL/nXl/76emHv01sVV8LWxod+Kvv5YZIrqS4AQmeCWW8U2/3KrDQyhLpgCEp8IxMdeJH/uv6q+kSQuAnJILxJblhTzwh0zs8dF/mwAgNaB6JXwlBoDysgIDAPwh2Ymn5Bb9sPjrryVKTC/IADjBvN/33xQAUidfywoRXUl8JMhfSQIgyq18hQDKkA4AoZ5Sh/iU5H5+/EMCgqQpH4D/HA6B8krOl5+Qr9p/PJk8B2Dt5o0PRsDikLzob2O0cbHlWJ43/5l4yV+c8XXiM5NXz/LCOQDs0PuKaOn8DzW2yliQv33is2/+l+8GABSEiK5ELhB9JQmAKNeojqASVQAgc5z65pd9Cx8dJE1aJ8EVRsCv+IlUIVNPJQHglEVPBW6Ldig3Ldq4eGcSDGv8xcP3T078Nv/ts2qEp0rMWJB7TwZbfXtKdVPBoTs7xMlwgeCVFAB1TjGgLFEBwPyv/v2zfsduBMCPTSoDwFrfSTH68h9VISEAkQc/SNjLJHqA8CaGXFx5xSDNH5+J58kSkwuqDiLWnv0lkyFiK4l1hHKBJAC1rg1AGUoB8KD4HKB4oPImv5L/Tr0hkBzoiraTPwSSh/ekVGH8tJCP+E/elo/qelP8KlC8uYZBss4BxHlMAIDwqhMUHs4/64iUmLGgOpkJAHgqvuZoiNhKYseBZHfwzrzTL6iWTAHI3gvhPn2gBsmaJ8Hh+5klFwPA2seJX+MjnwfiMRhGVwBgwi8XTclTTyMA0gumAHjnBABYqywA5O7xO+2Cy6Bv/xeqDYe9s2zZCZMWANklF4sV8zjPy7I+HrmnXARAagh0W0V/81U+m0Ne/ckYAuUBkFowE4B6Q6DbAKAppQAQt6NeVLeoCm6E/c5UYiDAr3TzIdDJlEkPgOySCyU7CHmOKppKCQBqQCIe5NuxkXVs8cRJcD4AiQVTAMSqMRGi5CQ4mhEANKH0bNDgwrXcEUkAouev4dE0MlQRL8ZNwRE+aGlZAGSXXCwRVvZLYpmgIUYu/0SbKz+uvsivMUqXvBrJXHwJRv0fqwM5XzxxGTQbgIwFUwCwQ0PsMmg0RMll0GhGANCE0gDIoymXaKIpAMIpa9FWGk4G+vAkZdIEILvkQj2YCm6CiQLDvoQ9ZgCgzln9+05cjwvXl+Nxp/zAypvfA6QX/IMkAI9PTcX7tEjBiUD+Nabg3WhGANCEsj4PIG7uq2t7aQCyJy3LF98WTDtIT4cuB8B8OnR0GkTkXFNOV8gCQG6cTMmnHLztww8iUyH86QlqtoOY4q2mQuSeBCcX/P0kAHw+xomfTtVwMBXibGoqxNnIu0FGANCE2vxAzHc/2MPL2Lcj2EP2qU0Avn22hwcwAGC3WgTgjV/t4zwuAGC3WgTgwY/2sP0DAMuFD8VDvRYAgHotAAD1WgAA6rUAANRrEQEwtl1uZu06SancrFYAYLecjOpUVgBgtZyM6lRWAGC1nIzqVFYAYLWcjOpUVgBgtZyM6lRWAGC1nIzqVFYAYLWcjOpUVgBgtZyM6lRWAGC1nIzqVFYAYLWcjOpU1o4AuP8znjd4NuudvflTt8qeJ5c4s1Fx600Wy9X+kie0wCOqfyQlUwAgw6x7g4UwFn+2v5QMuf/CQkEtG0TNzcprapo97nhe3i5LxYpWKFl76ByA3ZFoMtOZ8Z0FgKS0uIgAuMvaf+L1NACr9bZAEwC+1tW+A8Aq4ic3+FFpeTz+6sgbPMMD+0/kBst9ITbyWxc87/RN+Xz3Mnu+zGvpuRF/cbx/zRt8hG+w79IRPQD+rrC2B9gR7V8e9wdPj079luwBWB2+e2PsV6rAeLrpHmBwwePdjAAg2Jk80k1/B7JYX7jsnb6lYqUBoGgPXQOwO+KM7l+7Ig4GsitQT9iGfWnJuzJWG8xri9dX9Ll/zJ1WB1/+rnwk2lNGsh6A35S9kwSAV9PL6lmk6r7eCgCnPuXNsRHQ05FdpiIldm18v4cAkLSHrgHYYbUgtTsafHq8Oz9YDp6wDftZ9TbfSAlL2OXtyp03x7r1Mxu7o1PLrCfhT/SHQfQAhOzaCIAabPoATAfP5kSFcxOvVDEEahyAL7AdtcqQlLtrN4ikdqCItTMK304CQNIe7AFgR+yadW8heCJ2mD8YVcesx575mtzg/XufvOCJjnxZDPV25O6UxwDu0lHvABj8EzGk9IdAy9GTYN7o/UptB4Avzg9+ZekMb6yxnTlWOzDYtertJAAk7aFrAPwh0C9f2cgE4LFRZEwxHt+7piri/vzpz7+sdl5sg5WLaE8ZyfYh0EAeFPMAUJXaDgC3Vr2fGM3tsDzhzpS9kNyBwa5Vb6dPggnaQ9cAhCfBmUOgW+t+D6E2fP8T8hrjuvfE+O4ossFBl6dcRHvKSLYDIOqK1WgSALYP7rMKV5XaEgA7HtvtHIBwZ0oA5A4Mdq16O+sqUO320DUAbJCXPPeNngTHNnhHvC5fU8+DDQ5OetQ7RHvKSA4AwIaa8tASAyBRdattnATzE1e+I8P1ykipXRvd7+TtoXMAIjfC+NXP6BOxsf5Jgnh+70JwOWz/BWZZjxwmxGWvn+dPfBfRnjKSCwDwM83UEEheBlWVym/OTL/cOACMs+kxByDcmaIH8Hdg2Jb9t1M9AEV76B6ALtVoVsLGz4VqbUQAoKms67o3IzSFam1EAKA5AFJzDmoJ1dqIAIB7WbtOUio3qxUA2C0nozqVFQBYLSejOpUVAFgtJ6M6lRUAWC0nozqVFQBYLSejOpWVHoBN6+Vk1q6DlMvJam0CgNx3XtdYWsdTs6DNzKetx9AybWY8I14FVUE61dpuE9DKGhEAaDWGlgkANGICAOmnrcfQMgGARkx9AOCRtNIBAQBdQQCgsHCuiu2WTOmAAICuIAAQLzyjARaEpm/tGAIZmwCAvg6GQouToxvD4aWswsnbbUQ4ByBcBVVB/QJAaG1m++jG7OTh1RgB+Vtf0O7LM0cFAAhXQVVQ/wA4OH9ncvjeFfZkZru08MI8hh5yALT6JuoYhlkBAKGJBICjG5f8tn/4vjv+a9eZNl+3XNE9JV+pOFyrqGpZN+krglbparVXJADwDmCyJQDg3UC49blLWNsDaC3dKiTpgOgBCE0UAIgOoE8AkMUAAE3G0DJRACBbfWIIlF94YR5Dj+MAmJicBqDpbrKC0lkjMgNAnvmKtu/8SXAnMbRMAIBW6awRmQGwNsv/N7oMCgCMTU4D0EkMLRMJALLV594IM8lj6AEAlKugKqhvAOTKkq0HAMYmAGCiteHw3Ap6AAoPACCMoWUiAICPgA7O38E5AIEHABDG0DLVB0Bd+j8eUyE6iaFlAgCNmOoDoNr88ZgKYa82XYzqVNaKAGzNvDQcnr+DO8EUHvQAhDG0TAQADOU5AAAg8AAAwhhaJooeYJtfAVrEVAgCDwAgjKFlIjoHYABgKgSBBwAQxtAy1QeAtX1cBgUAUfULAHEDjH8gADfC6nsAAGEMLRMBAIdPDodDNvQBAPU9AIAwhpaJAIADMRkUs0EpPLYAoDWhGABIrS2KB9wJJvB0A0CDc+wtaQKNngQ//34xAsJlUAKPEQBk7TYtrawAQEgMew4vbiduhGEqBLE2U1HpmntjUV2q1qoA+BQs4k4wgceWcwCcBBsKd4JpPACAMIaWqT4A4kuBHn58BXeCCTwAgDCGlongJFjcCTb8blAAYGwCAI2YCIZAD6+Kq0C4EUbgAQCEMbRMROcAJoVzAQBjEwBoxEQDgLj4gx6gvgcAEMbQMpEAcHTj3AqmQlB4AABhDC0TCQBbH2A9AKZCEHgAAGEMLRMFAIcXv8kaP+4DEHgAAGEMLRMBAEfPr/CjP6ZCNKtNF6M6lbUqAFuXJhkAiK3PXQY9gLEJPUAjpvoAHF7cFu0eQyACDwAgjKFlqg/Alv8zqZgKQeABAIQxtEwkV4FED4DLoAQeAEAYQ8tEBwBuhBF4AABhDC0TDQBGhXMBAGMTAGjERAAAP/LPTtADUHgAAGEMLRMBAGuz4odScQ5A4AEAhDG0TPUBEOP/rZltTIUg8AAAwhhaJppzAN4D4D4AgQcAEMbQMlEAwAb/rPFjKkSz2nQxqlNZKwMwwe8DoAeIqm89wATfCgEAouoXAPJbIa5iKgSFBwAQxtAy1QcA3wpRO4aWCQA0YiIYAvEbYPhWCBoPACCMoWUiOgcwKZwLABibAEAjpmYBsF5OZu06SLmcrNYGAIAgNwUAoF4LAEC9FgCAei0AAPVaAADqtQAA1GsBAKjXAgBQrwUAoF6LCICx7XIza9dJSuVmtQIAu+VkVKeyAgCr5WRUp7ICAKvlZFSnsgIAq+VkVKeyAgCr5WRUp7ICAKvlZFSnsgIAq+VkVKeyAgCr5WRUp7ICAKvlZFSnsgIAq+VkVKeydgjA/pLnTbPHHc87s7E3f+qW8XZUWohoT+3Newt8G6ok0BdhowoDV6u2MpEBwIIyDRYiL1DntQcAvmWrHADaDSwUGQAsvFsANBqYGABvsBy+cFwBGFxgByW+vX4PsH/N807f5G88PTp1c/zVkTd4ZoPvs+dG/PXx/m+wV66wRb91QRjFQruX2fPl0rVlbr1xzYXisedke/ITiOd782c2ZP7fVn/WWAkxAH5gXm1B2LBSa4oQAJ5qlYX1Kza6m/cpatUaAE59im3ljve0DwDvEninIB7PbKyKA8H0WL7MR0vylTn/GCEXUs8rbb151QXi6x0sy/YkE0QA4H9/3UIAVOAoAKpS64oegKzdfMwA+MKItfNTv+lv5C477LMNX2ANiLX23dHg0+Pdeb7P2O65yzy7ozM3x/eFUVaA6ht3jfpIKgAYvrKV+wmiAEyPaY5VpACowDEAgkqtWz4hAJEh0O58eM4Sq2SqrN0C8MX5wa8snbnrA7DjH4fYEGKZnxvzM+R1zsNgWWzzjufXDD/EPvbM1yQA+/c+ecHrBIAvLXlXlsIE0SHQspUA+IFjAASVWrd8YgD4qNav2OhuPmYA3Fr1fmI0txMAMO2/kQAgva/uXVM1c3/+9Odf7qYHYD3R4EKYwH4A/MDWA+DXmarY6G4+bgDs8KrfiQyBxr/uzckGFBkCRXvrYOlPeAt8oXXvifHdUTcAMDy9MAHrl66wV0IA/D9rrIQaABnYP9+S6WKVWkf0AKiKje5mklq1CABxbW4ndRIsjkfhSXD8fE0dtWTNqOeVtt686gKJ9uTH9xOoeLH8dgEgAotnQTqKmPGoVABk7maSuPYAwLZnerwTXAZ9wb/UJTtkfhn02ehYYv+Fkee9m237vQvB9TG2zODZdW+hZGXZW29acRHJM7MdL5Jg77I3+EgwBAr+rLEScgBEYImCShdUak3RA6AqNrabKWrVEgC6kptZu05SKjerFQDYLSejOpUVAFgtJ6M6lRUAWC0nozqVFQBYLSejOpUVAFgtJ6M6lRUAWC0nozqVFQBYLSejOpUVAFgtJ6M6lZUegK5/A7lcTmbtOki5nKzWJgDIfUfn5+11PDUL2sx82noMLdNmxjPiVVAVpFOt7TYBrawRAYBWY2iZnAbgEW0RxjDNGhEAaDWGlqknAMQgyFhD2g0AqnsAQCMF1RkCxSh4Pf2yVs9RsLbkAgAg/bT1GFqmngDAZdbQtTDILag+AAdDocXJ0Y3h8FLsLQBAWFCPABDSPsC/nmHXB4ioB1ib2T66MTt5eDVGAAAgLKhvAFSKkdvuGz4HODh/Z3L43hX2ZGa7tPBk6DoeAEC5CqqCugPA3EQCwNGNS37bP3zfndLCC/MYegAA5SqoCuodALwDmGwJAHg3IHSdafN1yxXdU11nKdNmKqrusLcpaUR1qVqrAyA6gCQAYutzF0EPYGxK9wBdAxAoP6otTaDZHkC2egyBCDxODYFySegbAPLMV7R93ZNgncMJAIjJPgACU98BWJvl/+tcBjXqWMm2Pp8yANBIQb0DQLb63BthZo07pz8odRopHjDxNC5LGhUAaMZEchWopPCM5mx04C56T0cYAhmbAICJ1obDcysFPYBJnqQnTUEcJ5wDEK6CqqCeAcBHQAfn7zQ3FSJ/CAMASFdBVVC/AFCX/hueCpEzIHIbAJ0BXDogACA01QdAtXncByiR0XkLAKgfQ8tUH4CtmZeGw/N3+j0VomLjrpa1XtQWRFatLYgAgKE8BzgeUyEqtmSt1l5ve9ADNGKi6AG2+RWgxeMxBGqwcQOAlmNomYjOARgARlMhrAWgkxhaJgDQiKk+AKztN3wZtK4JABibAICB+A0w/oEAfCa4vgcAEMbQMhEAkC9Lth4AGJsAgIEOnxwOh2zsjx6gvgcAEMbQMhEAcCBmQ2tNhy7PY+gBAJSroCqoZwCsLYoHfCsEgQcAEMbQMtUH4Oj594sR0PG4D9BJDC0TAGjEVB8AMew5vLjd66kQLWjTxahOZa0IgE/B4vGYCtFJDC0TeoBGTEQAHJupEJ3E0DIBgEZM9QEQ34r18OMrmApB4AEAhDG0TAQnwWIqBL4cl8QDAAhjaJkIhkAPr4qrQLgRRuABAIQxtExE5wAmhXMBAGMTAGjERAOAuPiDHqC+BwAQxtAykQBwdOPcCqZCUHgAAGEMLRMJAFsfYD0ApkIQeAAAYQwtEwUAhxe/yRo/7gMQeAAAYQwtEwEAR8+v8KM/pkI0q00XozqVtSoAW5cmGQCIrc9dBj2AsQk9QCOm+gAcXtwW7R5DIAIPACCMoWWqD8CW/zvBmApB4AEAhDG0TCRXgUQPgMugBB4AQBhDy0QHAG6EEXgAAGEMLRMNAEaFcwEAYxMAaMREAAA/8s9O0ANQeAAAYQwtEwEAa7Pil4JxDkDgAQCEMbRM9QEQ4/+tmW1MhSDwAADCGFommnMA3gPgPgCBBwAQxtAyUQDABv+s8WMqRLPadDGqU1krAzA5Rj+Q0UkMLRN6gEZMRADgWyFoPACAMIaWqT4A8lshrmIqBIUHABDG0DLVBwDfClE7hpYJADRiIhgC8Rtg+FYIGg8AIIyhZSI6BzApnAsAGJsAQCOmZgGwXk5m7TpIuZys1gYAgCA3BQCgXgsAQL0WAIB6LQAA9VoAAOq1AADUawEAqNcCAFCvlQLge//ob/n621/RL2Zsu9zM2nWSUrlZrcUAfNTz9Q4A0I2cjOpU1iIAqqnrjSuVm1m7TlIqN6u1DIC//PPJ5K0/BQBdycmoTmUtBOCtf+/93cnkG97f+XMA0I2cjOpU1kIAvuGxts8o4BgAgC7kZFSnshYB8NbnvH/MH/+n9wMGXUDXG1cqN7N2naRUblZrIQDf+6i8+qMeAUDrcjKqU1kBgNVyMqpTWYsAmPw7Ofj/hvdD+u3fqa3vOkqpnIzqVNZCAL7zHu+vfOxjf9Mb/BsA0I2cjOpU1kIAJt/5BX4f+PtN2r9TW991lFI5GdWprMUATCZ/+Ud/ZHYfLLH1e/McocGCZjJmZ9b9pVO38j33r408713LsaWK/AVbr79QOsVlz3v3Ro0CtKQRNRnErDJi9vxF9+bPbGS/E4imWveX5OSb6RpllEsfgD+ZTP73v/rYv64LgDdYzk6SFLOzfVAIwO5IVpEuU0VbX7UItV3N7qaxDgCpIACgXLoAfOc97/jK/+Vxqt8IEzW3v+rNjXfZker0Mm/cz428034rF2/770i7x6zirf3fGHmDK+w5g2fdO7MhnogaemJjfH9JvOKXwHecX+7NsVpwHC03Z+urV+Hu6MzGfd5e/JXseH/1Gtuqr45EZ/dVluCZjdwE+iqPGgRRK92L/pEZK6yqsd/ov3XB43/vRTYoUp/XvMFH+H7yXaVRaw6B+BZlhWU5Tv9Wor1UlCYAb33O+4E/+5z3Q/+jxo2wAAB5pOKt1lNPguYrX5B23luIt1aFb441/gX2/NQtv17Uwz+8OU4AoI4casFouTlbX70Kd0eDKxvjcbCSHbHSx9i/IPp0bgJ96QAgg0RWGkmQGSusqrEEQOWMPg9MwQ4r2RpiAFJhxZPHRqU5dKQJAL/+/533eL9Y5z5AbAi0Kxvq3Pg+G+qHPYD/jrSf+pR35utLor3fHPND2+5omhUyWN5hyzHthL1jEoC58V1WL8GC0XJztr56FYrd8S55OOQr2fFO3WSDsyt784Nl1iY/zV4Mt7n6asqjqiDBSvdEnfl/ZMYKqoovL+3hc5U5Up+nZBesXKVRKQBIhw1yqIQ1VmEAwDe8d3ylPgC8w9q/98kLnhiqsOjr3lwIgP+OtJ/60pJ3ZYm3KJ+c/aUz/2H0N0Zzq7JBCQB2xCEtAQB7n/8RLBgtN2fra9Th/gvysOqvZMc/9vIYklHec+Uk0JdGVD9IsNK9+cgfmbGCquKLq97zsWe+JgEI9lNQn9OyI1eu0qgUAKTDBjnq16rBjTA+/ucjoXpDIK7786c///J8FgDqHWkXh68LEQDGq4OfG/zT+R+87LMvqycDAP+PYMFouTlbX6MOme5d9hbUSmRLk2cqwc7LS6Avvag8SBEAiVixvlce9e9d402KP4/tp3jD812lUYkBSOaoX6vaAHzvF/h00O99tMaNsACAde+J8d2RONr85IYcAnlXRJem3pF29rjuef4QSGiH/7mqxqxsMf7Gf7wsipIlxAAIFoyWm7P11atw3ZveYKc2C2ol0ZYWdN95CfRVHlUFyRsCZcTKAIDV6yckO+F+CuozMvTgrtKoxEOgZI76tWpwGfQt/u9/mXwcIA8AeWAOTlbZq6te9PwxAoC8Fqre5n+Ks7kFVT/yEP9EWEIMgMxyc7a+ehXKFKqjigOQOAVtFgAVJO8kOCNWCgCVM/o8MAU7rGRraAFIhw1OguvXapsfiQwAYEPVwbOyS3tuJO7c7F2Wl9fUO9LON2xHDK5fGPl3eMRF1BD5/8PfeNenx2EJcQDUgtFyc7a+Rh2qq4X+SmItTVzCe3acm0BfGlGDi4L+SsPLoM+Ox9mxUj3AvQuiDFGP4X5S9XnNG/w8f+K7SqPSXQaNhWV7+/QXE+2loloEIKXiu7xtiGxPtSAnozaTdZffy7hb7/KnEgBwr1V1naRUTVerPxSboygLALjXqrpOUqrGq/X+L3vegJ35EahLALqXm1m7TlIqN6sVANgtJ6M6lRUAWC0nozqVFQBYLSejOpUVAFgtJ6M6lZUegK5/ArZcTmbtOki5nKzWJgDIfQe/FG9swi/FN2ICAOmnrcfQMgGARkwAIP209RhaJgDQiAkApJ+2HkPLBAAaMQGA9NPWY2iZAEAjJgCQftp6DC0TAGjEVB+Ag6HQ4uToxnB4SaPwwjyGHgBAuQqqgvoFgNDazPbRjdnJw6sxAizZegBgbAIAZjo4f2dy+N4V9mRmu7TwwjyGHgBAuQqqgiwE4JGU/DdIADi6cclv+4fvuxN53ZKtBwDGJnsBSLfkiioMaAgA7wAmWwIA3g0IXWfafN1yRfdU11nKtOliVJWVrNlWlU7WygCIDiAJgNj63EXQAxibnO4B6Fpyg1kjMgNAtnoMgQg8xxWATmJomSgAkGe+ou3jJLieBwAQxtAyUQCwNsv/x2VQAg8AIIyhZSIBQLZ63Air7wEAhDG0TCRXgcwK5zr+AGRciKhWUDogACA0kfQAw+G5lWPSA9BdrqBSOisAIDQRAMBHQAfn7xyPcwDydhsKALQcQ8tUHwB16R9TIQg8GAIRxtAy1QdAtXncByDwAADCGFqm+gBszbw0HJ6/g6kQDWvTxahOZa0KwFCeA2AqBIEHPQBhDC0TRQ+wza8ALWIIROABAIQxtExE5wAMAEyFIPAAAMIYWqb6ALC2f4wug3YSQ8sEABox1QdA3ADjHwg4FjfCOomhZQIAjZgIAMiXJVsPAIxNAMBAh08Oh0M29kcPUN8DAAhjaJkIADgQs6ExHZrCAwAIY2iZCABYWxQPmApB4AEAhDG0TPUBOHr+/WIEhPsABB4AQBhDy1QfADHsOby4jakQzWrTxahOZa0IgE/BIqZCEHjQAxDG0DIRAYCpEDQepwDI/exCvwAQ34r18OMrmApB4KkJgM7ncrRy1PvwTr8AkFMh8OW4JB4jACo1zqxVVGzuGAJJPbwqrgLhRhiBpyYAzbdtraw9AyBflmz9cQXAbBUFzZ06a/8AEBd/0APU9zh1EgwAlI5unFvBVAgKDwAgjKFlIgFg6wOsB8BUCAIPACCMoWWiAODw4jdZ48d9AAIPACCMoWUiAODo+RV+9MdUiGa16WJUp7JWBWDr0iQDALH1ucugBzA2oQdoxFQfgEl6XG4AAAqfSURBVMOL26LdYwhE4AEAhDG0TPUB2PJ/JxhTIQg8AIAwhpaJ5CqQ6AFwGZTAAwAIY2iZ6ADAjTACDwAgjKFlogHAqHAuAGBsAgCNmAgA4Ef+2Ql6AAoPACCMoWUiAGBtVvxSsL3nAPnTvwBAIwX1CwAx/t+a2bZlKoTWdN90QABAV1C/AODiPUDiPkAHd4JzJ7fnKrqnWotZUZsuRnUqa2UA2OCfNf4u7wRXndyOHqCRgvrXAxT/QIbWoCTjwK2z4uKmLwUAjE0AwFCF3wpREYCihl3uiAgAGJsAgL7kt0JcpZ8KQdZNAABjEwDQV/PfClHUKQAAwlVQFdQvAMQNMHwrBI0HABDG0DIRnQOYFM4FAIxNAKARU7MAWC8ns+ZbruuUo2OqWZBOtbYQQ8vUJABQy7pOZSIrqN7SWmugM4UCAG7qOpWJrKB6S2utgc4UCgC4qetUJrKC6i2ttQY6UygAAPVaAADqtQAA1GsBAKjXAgBQrwUAoF6LCICx7XI0K9S0AIB9otklkJYAgH2i2SWQlgCAfcqsYf4DhfwDSeFUdPHxjMlkbTg8t1Ji4q/P5njSyxSY1GOxdLLqRG0jKwCwT1kVLD6AtHX+TvhhJLa/eYNZu+R/VK/AxP/mX+eR5UkvU2BSj8WNQSerTtQ2sgIAC5VVwcGPlKvvZNoa/vgvLSa+myDP9PAq+29rNtOTWqbIpB6LG4NOVp2obWQFABYqt5bZPg6+kOAv7qhPqJabYofVpCfr7zxT7LFYOll1ojadFQDYp7xK5o0j8pU0osFszbwUH+lmmcTgezHXk/o71xR9LJZOVp2ojWcFAPYpp47F3kw1qmHkHCDPJIbDa7P5nvjf+aaJSfsvy6oTtfmsAMA+ZVfx4ZN8YBDp6P2j6nZw7Mw1HcQaTNKTWibfFD4WSyerTtQWsgIA+5RZwwfy+mHkO5nCBhM0qiKTalVJT3qZfFPwWCydrDpR28gKAOxTVgWrNhG5AuifNC6Gw4o8kxxXyAaT9GQsk2/SPv8tzaoTtY2sXQOwv+QJTec69uZP3apaekS1srKUC+xhxzuzoWF+YcF8DTFlVbD6gcLUjSP+txpW55r4PSG/USU9Gcvkm4LXC6WTVSdqG1kBgJbWRcBVb07Du+o1AQDUkLofAu2O2HF1f4k18735Mxs7opHxRrR72fNOLwsAgndJGlWljCIA+89PxRI9N/JO3wyD++8IoqfrBabZJZCWbANAtqURf8J7Bv5oAQBiDLTDugGVyu+5pqPBxTtfBwBuyTYAxquD5WCsscsavxUAiDGQGtvsikQs4l1BQiQaf0fYAIAzsg6A3dHc3jyDYLx/75MXPFsAYCm+KE5G/FT7S4NlkSiM5r8DANySdQDsL535dX7KeX/+9OdftqYHYM366WiqIFHwRL0DANySNQB4V9g4g7eYdTaIXuAPT4zvjhQAwbtVVTfrjufxbkmligDgR1Pv+ADUCUyzSyAtWQIAazby7JKPNvhAgrc4JglA5N2qqpuVpeKrV6ki5yx+NPUOf2G6XmCaXQJpyRYA9i57g4/IMYM8Bd5/wRs8u+4tCAAi71ZU7azxVCEAKpp6h22PN71RKzDNLoG01D0A7cjRrFDTAgD2iWaXQFoCAPaJZpdAWgIA9olml0BaAgD2iWaXQFoCAPaJZpdAWgIA9olml0BaAgD2iWaXQFrC7wRbKJp9AukIvxTfagwtEwBoUQCg1RhaJgDQogBAqzG0TACgRQGAVmNomQBAiwIArcbQMgGAFgUAWo2hZQIALcoEgIOs7yWSAgCEBQGAFmXcA6zNbMe+mU4KABAWBABalCkA/KsdYz/QIQUACAsCAC3KEADx4x3pH+gAAJQFAYAWZQiA+G7fxO8TXGfafN1yRQHoOkuZAECLMgNA/npT6hdq0AOQFgQAWpQZALLVYwhE4AEAdsgMAHnmG/+BDiEAQFgQAGhRZgDIXy+z5TLoIzpKBwQAUChDANRveeTcCMtogPQNRqvdAwBIS7RTIczaZl2lY2AIBBnKsAcYDvlP75lMhWij3QcCAJChjABYkz90bMs5gIkHAECZMgEg9gOUuApUzwMA7JDRbFC/zSfuA+BOMLEAQIsyAWBr5iXxO6+4E0zgQQ9gh4wAGMpzAABA4AEAdsisB9gWv+eNqRAEHgBgh4zPARgAmApB4AEAdsgEANb2cRkUABwvGd0H4DfA+AcC8Jng+h4AYIfwrRCtxtAyAYAWZQTA4ZPD4ZCN/dEDFKvmHA8A0KKMADgQs6GtmQ5t4kkDUHHeUXoVFZs7ALBCZnOBFsXD8ZgKQdZu08IQyB0ZXQV6/v1iBNSjqRBazb3BrFDTMgFADHsOL27jTjCBBz2AHTK+CvTw6iIAIPAAADtkDACmQtB4AIAdMpoKwW+CPfz4CqZCEHgAgB0ynwqBL8cl8QAAO2Q0BHp4VVwFwo0wAg8AsEOYCtFqDC0TAGhRpgCIiz/oAep7AIAdMv569HMrx2QqRCcxtEwAoEUZArD1AdYDHI+pEJ3E0DIBgBZl+O3QF7/JGn+PpkJ0IgDQosw+EPP8Cj/6404wgQc9gB0yAmDr0gQAEHkAgB0y+ma4i9ui3WMqBIEHANghs+8Fkr8TjKkQBB4AYIeq3AfAZVACDwCwQ7gR1moMLRMAaFGYCtFqDC0TAGhRxt8LNDtBD0DhAQB2yOxD8bPil4JxDkDgAQB2yPgHMrZmtjEVgsADAOyQ6TkA7wEwFaJZAYAWZQYAG/yzxo87wQQe9AB2yPgqEH4gg8YDAOwQvhWi1RhaJgDQosy/FeIqpkJQeACAHcK3QrQaQ8sEAFqU8Y0wfCsEjQcA2CGqqRC5up7/lpGnbkEaWduIoWWi2SeQjogAyNd1Ig9dQfWW1jGRFQQ1LgBguLSOiawgqHEBAMOldUxkBUGNq3EAIMhmAQCo1wIAUK8FAKBeCwBAvRYAgHotAAD1WgAA6rUAANRrAQCo16IHgP+SHv/kTDhnWnyOYDJZGw7PrRR7+OuzeQWlF8r3qMf6UbWy6kStmRVqRuQAiE/KbJ2/E35qhu1w3mDWLvmfKcv38L/5105kFpReKN+jHutH1cqqE7VmVqghkQMQ/Jq2+vKgreGP/9Ji/EP0eZ6HV9l/W7PZptRCBR71WD+qVladqDWzQg2pmXMAtpODT87/xR31UcpST6wHSJmy/s7xxB7rR9XKqhO1ZlaIXo0AwBtH5LtTRIPZmnkpNtTN8ojB92J+Qam/8zzRx/pRtbLqRK2ZFWpATQAgdmeqVQ0jA+scjxgOr80WFBT/O9czMWn/ZVG1supErZkVakINAHD4JB8YRHp6/7C6HRw78zwH8QaTNKUWyvWEj/WjamXViVozK9SI6AE4kBcQI18eFDYY1aqKPEGjSprSC+V6gsf6UbWy6kStmRVqRuQAqDYRuQTonzQuBuOKPI8cVvgNJmnKWCjXo33+WxpVK6tO1JpZoYZEDoD6Jb3UjSP+t9+ocj38npA6YCZNGQvleoLXa0fVyqoTtWZWqCFhKgTUawEAqNcCAFCvBQCgXgsAQL0WAIB6LQAA9VoAAOq1AADUawEAqNcCAFCvBQCgXgsAQL0WAIB6LQAA9VoAAOq1AADUawEAqNf6/4NiHihVP151AAAAAElFTkSuQmCC" /><!-- --></p>
+</div>
+</div>
+<div id="tables-with-dsi_flextable_defaults" class="section level2">
+<h2>Tables with dsi_flextable_defaults()</h2>
+<p><code>dsi_flextable_defaults()</code> sets WHO-style defaults for
+<code>flextable</code> globally — booktabs theme, bold headers, modest
+padding. Call it once near the top of your report and every subsequent
+<code>flextable()</code> picks up the formatting.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">library</span>(flextable)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="fu">dsi_flextable_defaults</span>(<span class="at">font_family =</span> <span class="st">&quot;Geogria&quot;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>uhc_clean <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="fu">max</span>(year)) <span class="sc">|&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>  <span class="fu">left_join</span>(who_countries, <span class="at">by =</span> <span class="st">&quot;iso3&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>  <span class="fu">select</span>(name_short, value_num) <span class="sc">|&gt;</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(value_num)) <span class="sc">|&gt;</span></span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a>  <span class="fu">set_table_properties</span>(<span class="st">&quot;autofit&quot;</span>, <span class="at">width =</span> .<span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">&quot;UHC SCI in WPR, latest year&quot;</span>)</span></code></pre></div>
+<div class="tabwid"><style>.cl-1dc3be86{table-layout:auto;width:60%;}.cl-1dbb4288{font-family:'Geogria';font-size:12pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(51, 51, 51, 1.00);background-color:transparent;}.cl-1dbb429c{font-family:'Geogria';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(51, 51, 51, 1.00);background-color:transparent;}.cl-1dbeb1ca{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:4pt;padding-right:4pt;line-height: 1;background-color:transparent;}.cl-1dbeb1de{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:4pt;padding-right:4pt;line-height: 1;background-color:transparent;}.cl-1dbef978{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(0, 0, 0, 1.00);border-top: 1.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1dbef982{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(0, 0, 0, 1.00);border-top: 1.5pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1dbef98c{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1dbef98d{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1dbef98e{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1dbef996{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-1dc3be86"><caption style="display:table-caption;margin:0pt;text-align:center;border-bottom: 0.00pt solid transparent;border-top: 0.00pt solid transparent;border-left: 0.00pt solid transparent;border-right: 0.00pt solid transparent;padding-top:3pt;padding-bottom:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;"><span>UHC SCI in WPR, latest year</span></caption><thead><tr style="overflow-wrap:break-word;"><th class="cl-1dbef978"><p class="cl-1dbeb1ca"><span class="cl-1dbb4288">name_short</span></p></th><th class="cl-1dbef982"><p class="cl-1dbeb1de"><span class="cl-1dbb4288">value_num</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Australia</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">89</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">New Zealand</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">89</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Republic of Korea</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">88</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Singapore</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">88</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Japan</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">86</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">China</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">85</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Brunei Darussalam</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">84</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Malaysia</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">80</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Cook Islands</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">75</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Palau</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">75</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Tonga</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">71</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Viet Nam</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">71</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Mongolia</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">70</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Fiji</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">69</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Philippines</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">69</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Indonesia</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">67</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Niue</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">67</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Marshall Islands</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">66</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Micronesia</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">65</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Tuvalu</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">65</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Lao PDR</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">64</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Cambodia</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">62</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Nauru</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">62</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Samoa</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">62</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Vanuatu</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">52</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Kiribati</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">51</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98c"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Solomon Islands</span></p></td><td class="cl-1dbef98d"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">47</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1dbef98e"><p class="cl-1dbeb1ca"><span class="cl-1dbb429c">Papua New Guinea</span></p></td><td class="cl-1dbef996"><p class="cl-1dbeb1de"><span class="cl-1dbb429c">32</span></p></td></tr></tbody></table></div>
+</div>
+<div id="working-with-sdg-indicators" class="section level2">
+<h2>Working with SDG indicators</h2>
+<p><code>sdg_data()</code> and <code>sdg_clean()</code> follow the same
+fetch-then-tidy pattern as their GHO counterparts. The main differences
+are that indicator codes use the dotted SDG format
+(e.g. <code>&quot;3.4.1&quot;</code>) and that <code>value</code>,
+<code>low</code>, and <code>high</code> are kept as character — the SDG
+API returns non-numeric entries (<code>&quot;&lt;0.1&quot;</code>, aggregate
+notes) for some rows, so coerce with <code>as.numeric()</code> only when
+you are ready to drop them.</p>
+<p><code>sdg_indicators()</code> accepts an optional <code>search</code>
+argument with the same behaviour as <code>gho_indicators()</code> —
+multiple keywords are AND-ed together and matched case-insensitively
+against the indicator description. The filter runs client-side because
+the UN SDG indicator list is short (~250 rows) and the endpoint is not
+OData.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># All indicators that mention both mortality and cancer</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="fu">sdg_indicators</span>(<span class="st">&quot;mortality cancer&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="co">#&gt; Fetching: &lt;https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Indicator/List&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co">#&gt;   goal  target code  description                              tier  uri   series</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;                                    &lt;chr&gt; &lt;chr&gt; &lt;list&gt;</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; 1 3     3.4    3.4.1 Mortality rate attributed to cardiovasc… 1     /v1/… &lt;df&gt;</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co"># Same as above, but with explicit terms (allows whitespace inside a term)</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="fu">sdg_indicators</span>(<span class="fu">c</span>(<span class="st">&quot;maternal&quot;</span>, <span class="st">&quot;mortality&quot;</span>))</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="co">#&gt; Fetching: &lt;https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Indicator/List&gt;</span></span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="co">#&gt;   goal  target code  description              tier  uri                   series</span></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;                    &lt;chr&gt; &lt;chr&gt;                 &lt;list&gt;</span></span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="co">#&gt; 1 3     3.1    3.1.1 Maternal mortality ratio 1     /v1/sdg/Indicator/3.… &lt;df&gt;</span></span></code></pre></div>
+<p>The <code>area</code> argument of <code>sdg_data()</code> and
+<code>sdg_coverage()</code> accepts either ISO3 codes (converted
+internally via <code>iso3_to_m49()</code>) or UN M49 numeric codes — so
+DSIR’s regional vectors (<code>wpro_cty</code>, <code>afro_cty</code>,
+etc.) work directly, the same way they do with the GHO client. Do not
+mix the two formats in a single call.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># ISO3 — regional vector passed straight through</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>sdg <span class="ot">&lt;-</span> <span class="fu">sdg_data</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>  <span class="at">indicator =</span> <span class="st">&quot;3.4.1&quot;</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>  <span class="at">area      =</span> wpro_cty</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>)</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt; &lt;https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Indicator/Data?indicator=3.4.1&amp;pageSize=1000&amp;areaCode=036&amp;areaCode=096&amp;areaCode=156&amp;areaCode=184&amp;areaCode=242&amp;areaCode=583&amp;areaCode=360&amp;areaCode=392&amp;areaCode=116&amp;areaCode=296&amp;areaCode=410&amp;areaCode=418&amp;areaCode=584&amp;areaCode=496&amp;areaCode=458&amp;areaCode=570&amp;areaCode=520&amp;areaCode=554&amp;areaCode=608&amp;areaCode=585&amp;areaCode=598&amp;areaCode=702&amp;areaCode=090&amp;areaCode=776&amp;areaCode=798&amp;areaCode=704&amp;areaCode=548&amp;areaCode=882&amp;page=1&gt;</span></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>sdg <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a><span class="co">#&gt; Rows: 462</span></span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a><span class="co">#&gt; Columns: 21</span></span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a><span class="co">#&gt; $ goal              &lt;list&gt; &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;…</span></span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a><span class="co">#&gt; $ target            &lt;list&gt; &quot;3.4&quot;, &quot;3.4&quot;, &quot;3.4&quot;, &quot;3.4&quot;, &quot;3.4&quot;, &quot;3.4&quot;, &quot;3.4&quot;, &quot;3…</span></span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a><span class="co">#&gt; $ indicator         &lt;list&gt; &quot;3.4.1&quot;, &quot;3.4.1&quot;, &quot;3.4.1&quot;, &quot;3.4.1&quot;, &quot;3.4.1&quot;, &quot;3.4.1…</span></span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a><span class="co">#&gt; $ series            &lt;chr&gt; &quot;SH_DTH_NCOM&quot;, &quot;SH_DTH_NCOM&quot;, &quot;SH_DTH_NCOM&quot;, &quot;SH_DTH…</span></span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a><span class="co">#&gt; $ seriesDescription &lt;chr&gt; &quot;Mortality rate attributed to cardiovascular disease…</span></span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a><span class="co">#&gt; $ seriesCount       &lt;chr&gt; &quot;4326&quot;, &quot;4326&quot;, &quot;4326&quot;, &quot;4326&quot;, &quot;4326&quot;, &quot;4326&quot;, &quot;432…</span></span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a><span class="co">#&gt; $ geoAreaCode       &lt;chr&gt; &quot;36&quot;, &quot;36&quot;, &quot;36&quot;, &quot;36&quot;, &quot;36&quot;, &quot;36&quot;, &quot;36&quot;, &quot;36&quot;, &quot;36&quot;…</span></span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a><span class="co">#&gt; $ geoAreaName       &lt;chr&gt; &quot;Australia&quot;, &quot;Australia&quot;, &quot;Australia&quot;, &quot;Australia&quot;, …</span></span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a><span class="co">#&gt; $ timePeriodStart   &lt;int&gt; 2000, 2000, 2000, 2005, 2005, 2005, 2010, 2010, 2010…</span></span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a><span class="co">#&gt; $ value             &lt;chr&gt; &quot;9.8&quot;, &quot;13&quot;, &quot;16&quot;, &quot;11.4&quot;, &quot;8.7&quot;, &quot;14&quot;, &quot;12.1&quot;, &quot;9.9…</span></span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a><span class="co">#&gt; $ valueType         &lt;chr&gt; &quot;Float&quot;, &quot;Float&quot;, &quot;Float&quot;, &quot;Float&quot;, &quot;Float&quot;, &quot;Float&quot;…</span></span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a><span class="co">#&gt; $ time_detail       &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a><span class="co">#&gt; $ timeCoverage      &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a><span class="co">#&gt; $ upperBound        &lt;chr&gt; &quot;11.2&quot;, &quot;14.7&quot;, &quot;18&quot;, &quot;12.9&quot;, &quot;10&quot;, &quot;15.8&quot;, &quot;13.8&quot;, …</span></span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a><span class="co">#&gt; $ lowerBound        &lt;chr&gt; &quot;8.4&quot;, &quot;11.3&quot;, &quot;14.1&quot;, &quot;9.8&quot;, &quot;7.5&quot;, &quot;12.2&quot;, &quot;10.4&quot;,…</span></span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a><span class="co">#&gt; $ basePeriod        &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a><span class="co">#&gt; $ source            &lt;chr&gt; &quot;Global Health Estimates 2021: Deaths by Cause, Age,…</span></span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a><span class="co">#&gt; $ geoInfoUrl        &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a><span class="co">#&gt; $ footnotes         &lt;list&gt; &quot;Data was previously disseminated with a different …</span></span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a><span class="co">#&gt; $ attributes        &lt;df[,1]&gt; &lt;data.frame[26 x 1]&gt;</span></span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a><span class="co">#&gt; $ dimensions        &lt;df[,1]&gt; &lt;data.frame[26 x 1]&gt;</span></span>
+<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a></span>
+<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a><span class="co"># M49 also works (e.g. when copy-pasting codes from sdg_areas())</span></span>
+<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a><span class="fu">sdg_data</span>(<span class="st">&quot;3.4.1&quot;</span>, <span class="at">area =</span> <span class="fu">c</span>(<span class="st">&quot;608&quot;</span>, <span class="st">&quot;250&quot;</span>))</span>
+<span id="cb20-35"><a href="#cb20-35" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb20-36"><a href="#cb20-36" tabindex="-1"></a><span class="co">#&gt; &lt;https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Indicator/Data?indicator=3.4.1&amp;pageSize=1000&amp;areaCode=608&amp;areaCode=250&amp;page=1&gt;</span></span>
+<span id="cb20-37"><a href="#cb20-37" tabindex="-1"></a><span class="co">#&gt; # A tibble: 42 × 21</span></span>
+<span id="cb20-38"><a href="#cb20-38" tabindex="-1"></a><span class="co">#&gt;    goal      target indicator series   seriesDescription seriesCount geoAreaCode</span></span>
+<span id="cb20-39"><a href="#cb20-39" tabindex="-1"></a><span class="co">#&gt;    &lt;list&gt;    &lt;list&gt; &lt;list&gt;    &lt;chr&gt;    &lt;chr&gt;             &lt;chr&gt;       &lt;chr&gt;      </span></span>
+<span id="cb20-40"><a href="#cb20-40" tabindex="-1"></a><span class="co">#&gt;  1 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-41"><a href="#cb20-41" tabindex="-1"></a><span class="co">#&gt;  2 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-42"><a href="#cb20-42" tabindex="-1"></a><span class="co">#&gt;  3 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-43"><a href="#cb20-43" tabindex="-1"></a><span class="co">#&gt;  4 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-44"><a href="#cb20-44" tabindex="-1"></a><span class="co">#&gt;  5 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-45"><a href="#cb20-45" tabindex="-1"></a><span class="co">#&gt;  6 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-46"><a href="#cb20-46" tabindex="-1"></a><span class="co">#&gt;  7 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-47"><a href="#cb20-47" tabindex="-1"></a><span class="co">#&gt;  8 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-48"><a href="#cb20-48" tabindex="-1"></a><span class="co">#&gt;  9 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-49"><a href="#cb20-49" tabindex="-1"></a><span class="co">#&gt; 10 &lt;chr [1]&gt; &lt;chr&gt;  &lt;chr [1]&gt; SH_DTH_… Mortality rate a… 4326        250        </span></span>
+<span id="cb20-50"><a href="#cb20-50" tabindex="-1"></a><span class="co">#&gt; # ℹ 32 more rows</span></span>
+<span id="cb20-51"><a href="#cb20-51" tabindex="-1"></a><span class="co">#&gt; # ℹ 14 more variables: geoAreaName &lt;chr&gt;, timePeriodStart &lt;int&gt;, value &lt;chr&gt;,</span></span>
+<span id="cb20-52"><a href="#cb20-52" tabindex="-1"></a><span class="co">#&gt; #   valueType &lt;chr&gt;, time_detail &lt;lgl&gt;, timeCoverage &lt;lgl&gt;, upperBound &lt;chr&gt;,</span></span>
+<span id="cb20-53"><a href="#cb20-53" tabindex="-1"></a><span class="co">#&gt; #   lowerBound &lt;chr&gt;, basePeriod &lt;lgl&gt;, source &lt;chr&gt;, geoInfoUrl &lt;lgl&gt;,</span></span>
+<span id="cb20-54"><a href="#cb20-54" tabindex="-1"></a><span class="co">#&gt; #   footnotes &lt;list&gt;, attributes &lt;df[,1]&gt;, dimensions &lt;df[,1]&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">sdg_clean</span>(sdg)</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="co">#&gt; # A tibble: 462 × 15</span></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="co">#&gt;    source id    indicator     location iso3  location_name  year value value_num</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;         &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="co">#&gt;  1 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2000 28.1       28.1</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="co">#&gt;  2 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2000 25.4       25.4</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="co">#&gt;  3 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2000 31.8       31.8</span></span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="co">#&gt;  4 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2005 22.5       22.5</span></span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">#&gt;  5 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2005 25.6       25.6</span></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#&gt;  6 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2005 29.7       29.7</span></span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="co">#&gt;  7 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2010 24.4       24.4</span></span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="co">#&gt;  8 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2010 20.9       20.9</span></span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a><span class="co">#&gt;  9 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2010 29.1       29.1</span></span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a><span class="co">#&gt; 10 sdg    3.4.1 Mortality ra… 116      KHM   Cambodia       2015 28.3       28.3</span></span>
+<span id="cb21-15"><a href="#cb21-15" tabindex="-1"></a><span class="co">#&gt; # ℹ 452 more rows</span></span>
+<span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a><span class="co">#&gt; # ℹ 6 more variables: low &lt;dbl&gt;, high &lt;dbl&gt;, series &lt;chr&gt;, dim1 &lt;chr&gt;,</span></span>
+<span id="cb21-17"><a href="#cb21-17" tabindex="-1"></a><span class="co">#&gt; #   dim2 &lt;chr&gt;, dim3 &lt;chr&gt;</span></span></code></pre></div>
+<p><code>sdg_clean()</code> produces the same 15-column schema as
+<code>gho_clean()</code>, so the two outputs can be combined directly
+with <code>bind_indicators()</code>. SDG rows populate the
+<code>series</code> column (and the <code>iso3</code> column via
+[<code>m49_to_iso3()</code>] for Member States), while leaving the
+GHO-only <code>dim1</code>–<code>dim3</code> columns as
+<code>NA</code>.</p>
+<div id="combining-gho-and-sdg-with-bind_indicators" class="section level3">
+<h3>Combining GHO and SDG with bind_indicators()</h3>
+<p>When an analysis pulls indicators from both sources,
+<code>bind_indicators()</code> stacks any number of cleaned tibbles into
+one. The <code>source</code> column (<code>&quot;gho&quot;</code> /
+<code>&quot;sdg&quot;</code>) lets you filter or facet by origin without
+remembering which frame came from which API.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># Two indicators on the same topic from different APIs:</span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="co">#   GHO NCDMORT3070 (probability of premature NCD mortality)</span></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="co">#   SDG 3.4.1       (mortality rate from NCDs)</span></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>gho_ncd <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&quot;NCDMORT3070&quot;</span>, <span class="at">area =</span> wpro_cty) <span class="sc">|&gt;</span> <span class="fu">gho_clean</span>()</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="co">#&gt; Assuming `spatial_type` = &quot;country&quot; since `area` was given.</span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a><span class="co">#&gt; ℹ Pass `spatial_type` explicitly to silence this message.</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&gt; &lt;https://ghoapi.azureedge.net/api/NCDMORT3070?$filter=SpatialDimType%20eq%20%27COUNTRY%27%20and%20SpatialDim%20in%20%28%27AUS%27%2C%27BRN%27%2C%27CHN%27%2C%27COK%27%2C%27FJI%27%2C%27FSM%27%2C%27IDN%27%2C%27JPN%27%2C%27KHM%27%2C%27KIR%27%2C%27KOR%27%2C%27LAO%27%2C%27MHL%27%2C%27MNG%27%2C%27MYS%27%2C%27NIU%27%2C%27NRU%27%2C%27NZL%27%2C%27PHL%27%2C%27PLW%27%2C%27PNG%27%2C%27SGP%27%2C%27SLB%27%2C%27TON%27%2C%27TUV%27%2C%27VNM%27%2C%27VUT%27%2C%27WSM%27%29&gt;</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a>sdg_ncd <span class="ot">&lt;-</span> <span class="fu">sdg_data</span>(<span class="st">&quot;3.4.1&quot;</span>,        <span class="at">area =</span> wpro_cty) <span class="sc">|&gt;</span> <span class="fu">sdg_clean</span>()</span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a><span class="co">#&gt; &lt;https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Indicator/Data?indicator=3.4.1&amp;pageSize=1000&amp;areaCode=036&amp;areaCode=096&amp;areaCode=156&amp;areaCode=184&amp;areaCode=242&amp;areaCode=583&amp;areaCode=360&amp;areaCode=392&amp;areaCode=116&amp;areaCode=296&amp;areaCode=410&amp;areaCode=418&amp;areaCode=584&amp;areaCode=496&amp;areaCode=458&amp;areaCode=570&amp;areaCode=520&amp;areaCode=554&amp;areaCode=608&amp;areaCode=585&amp;areaCode=598&amp;areaCode=702&amp;areaCode=090&amp;areaCode=776&amp;areaCode=798&amp;areaCode=704&amp;areaCode=548&amp;areaCode=882&amp;page=1&gt;</span></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a><span class="fu">bind_indicators</span>(gho_ncd, sdg_ncd) <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a><span class="co">#&gt; Rows: 1,914</span></span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a><span class="co">#&gt; Columns: 15</span></span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a><span class="co">#&gt; $ source        &lt;chr&gt; &quot;gho&quot;, &quot;gho&quot;, &quot;gho&quot;, &quot;gho&quot;, &quot;gho&quot;, &quot;gho&quot;, &quot;gho&quot;, &quot;gho&quot;, …</span></span>
+<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a><span class="co">#&gt; $ id            &lt;chr&gt; &quot;NCDMORT3070&quot;, &quot;NCDMORT3070&quot;, &quot;NCDMORT3070&quot;, &quot;NCDMORT307…</span></span>
+<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a><span class="co">#&gt; $ indicator     &lt;chr&gt; &quot;Probability (%) of dying between age 30 and exact age 7…</span></span>
+<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a><span class="co">#&gt; $ location      &lt;chr&gt; &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, …</span></span>
+<span id="cb22-19"><a href="#cb22-19" tabindex="-1"></a><span class="co">#&gt; $ iso3          &lt;chr&gt; &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, &quot;AUS&quot;, …</span></span>
+<span id="cb22-20"><a href="#cb22-20" tabindex="-1"></a><span class="co">#&gt; $ location_name &lt;chr&gt; &quot;Australia&quot;, &quot;Australia&quot;, &quot;Australia&quot;, &quot;Australia&quot;, &quot;Aus…</span></span>
+<span id="cb22-21"><a href="#cb22-21" tabindex="-1"></a><span class="co">#&gt; $ year          &lt;int&gt; 2000, 2000, 2000, 2001, 2001, 2001, 2002, 2002, 2002, 20…</span></span>
+<span id="cb22-22"><a href="#cb22-22" tabindex="-1"></a><span class="co">#&gt; $ value         &lt;chr&gt; &quot;16.0 [14.1-18.0]&quot;, &quot;9.8 [8.4-11.2]&quot;, &quot;13.0 [11.3-14.7]&quot;…</span></span>
+<span id="cb22-23"><a href="#cb22-23" tabindex="-1"></a><span class="co">#&gt; $ value_num     &lt;dbl&gt; 16.0, 9.8, 13.0, 15.6, 12.6, 9.6, 15.0, 9.6, 12.3, 14.5,…</span></span>
+<span id="cb22-24"><a href="#cb22-24" tabindex="-1"></a><span class="co">#&gt; $ low           &lt;dbl&gt; 14.1, 8.4, 11.3, 13.7, 11.0, 8.2, 13.1, 8.2, 10.7, 12.6,…</span></span>
+<span id="cb22-25"><a href="#cb22-25" tabindex="-1"></a><span class="co">#&gt; $ high          &lt;dbl&gt; 18.0, 11.2, 14.7, 17.5, 14.3, 11.0, 16.8, 10.9, 13.9, 16…</span></span>
+<span id="cb22-26"><a href="#cb22-26" tabindex="-1"></a><span class="co">#&gt; $ series        &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span>
+<span id="cb22-27"><a href="#cb22-27" tabindex="-1"></a><span class="co">#&gt; $ dim1          &lt;chr&gt; &quot;SEX_MLE&quot;, &quot;SEX_FMLE&quot;, &quot;SEX_BTSX&quot;, &quot;SEX_MLE&quot;, &quot;SEX_BTSX&quot;…</span></span>
+<span id="cb22-28"><a href="#cb22-28" tabindex="-1"></a><span class="co">#&gt; $ dim2          &lt;chr&gt; &quot;AGEGROUP_YEARS30-69&quot;, &quot;AGEGROUP_YEARS30-69&quot;, &quot;AGEGROUP_…</span></span>
+<span id="cb22-29"><a href="#cb22-29" tabindex="-1"></a><span class="co">#&gt; $ dim3          &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span></code></pre></div>
+</div>
+<div id="exploring-series-with-sdg_coverage" class="section level3">
+<h3>Exploring series with sdg_coverage()</h3>
+<p>A single SDG indicator often contains several <strong>series</strong>
+— for example different vaccines, sex strata, or causes of death — each
+with its own country and year coverage. Indicator <code>&quot;3.b.1&quot;</code>
+(vaccine coverage) is a clear case: it is published as four separate
+series (DTP3, MCV2, PCV3, HPV), and the year coverage of the newer
+vaccines is much shorter than that of DTP3.</p>
+<p><code>sdg_coverage()</code> summarises the year range and observation
+count per <code>(location, series)</code>, so you can inspect what
+series exist and how each is covered before deciding which one to
+analyse.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">sdg_coverage</span>(<span class="st">&quot;3.b.1&quot;</span>, <span class="at">area =</span> <span class="fu">c</span>(<span class="st">&quot;156&quot;</span>, <span class="st">&quot;608&quot;</span>))</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="co">#&gt; Fetching:</span></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="co">#&gt; &lt;https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Indicator/Data?indicator=3.b.1&amp;pageSize=1000&amp;areaCode=156&amp;areaCode=608&amp;page=1&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co">#&gt; # A tibble: 8 × 5</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt;   location series      year_min year_max n_obs</span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;int&gt;    &lt;int&gt; &lt;int&gt;</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; 1 156      SH_ACS_DTP3     2000     2024    25</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt; 2 156      SH_ACS_HPV      2010     2024    15</span></span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="co">#&gt; 3 156      SH_ACS_MCV2     2000     2024    25</span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="co">#&gt; 4 156      SH_ACS_PCV3     2008     2024    17</span></span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt; 5 608      SH_ACS_DTP3     2000     2024    25</span></span>
+<span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a><span class="co">#&gt; 6 608      SH_ACS_HPV      2010     2024    15</span></span>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a><span class="co">#&gt; 7 608      SH_ACS_MCV2     2000     2024    25</span></span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a><span class="co">#&gt; 8 608      SH_ACS_PCV3     2008     2024    17</span></span>
+<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a><span class="co">#&gt;   location series      year_min year_max n_obs</span></span>
+<span id="cb23-16"><a href="#cb23-16" tabindex="-1"></a><span class="co">#&gt; 1 156      SH_ACS_DTP3     2000     2023    24</span></span>
+<span id="cb23-17"><a href="#cb23-17" tabindex="-1"></a><span class="co">#&gt; 2 156      SH_ACS_HPV      2018     2023     6</span></span>
+<span id="cb23-18"><a href="#cb23-18" tabindex="-1"></a><span class="co">#&gt; 3 156      SH_ACS_MCV2     2000     2023    24</span></span>
+<span id="cb23-19"><a href="#cb23-19" tabindex="-1"></a><span class="co">#&gt; 4 156      SH_ACS_PCV3     2017     2023     7</span></span>
+<span id="cb23-20"><a href="#cb23-20" tabindex="-1"></a><span class="co">#&gt; 5 608      SH_ACS_DTP3     2000     2023    24</span></span>
+<span id="cb23-21"><a href="#cb23-21" tabindex="-1"></a><span class="co">#&gt; 6 608      SH_ACS_HPV      2017     2023     7</span></span>
+<span id="cb23-22"><a href="#cb23-22" tabindex="-1"></a><span class="co">#&gt; 7 608      SH_ACS_MCV2     2000     2023    24</span></span>
+<span id="cb23-23"><a href="#cb23-23" tabindex="-1"></a><span class="co">#&gt; 8 608      SH_ACS_PCV3     2014     2023    10</span></span></code></pre></div>
+<p>Note that DSIR intentionally does <em>not</em> provide SDG analogues
+of <code>gho_has_data()</code> and <code>gho_count()</code>. SDG data is
+generally complete enough that those screening helpers add little value
+— the more useful pre-analysis question for SDG is “which series are
+available?”, which is what <code>sdg_coverage()</code> answers.</p>
+</div>
+</div>
+<div id="where-to-next" class="section level2">
+<h2>Where to next</h2>
+<ul>
+<li>Source code lives at <a href="https://github.com/shanlong-who/DSIR" class="uri">https://github.com/shanlong-who/DSIR</a>.</li>
+<li>Bug reports, feature requests, and pull requests are all welcome —
+please file them on the GitHub issue tracker.</li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
