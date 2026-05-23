@@ -1,11 +1,11 @@
 Package: DSIR
 Title: Data Science Infrastructure for Global Health
-Version: 0.7.0
+Version: 0.7.1
 Authors@R: person(given = "Shanlong",
                   family = "Ding",
                   role = c("aut", "cre"),
                   email = "dings@who.int",
-                  comment = c(ORCID = "0000-0002-8831-1684"))
+                  comment = c(ORCID = "0000-0001-9048-6670"))
 Description: Supports global health data analysis, including a
     publication-ready 'ggplot2' theme, a 'flextable' defaults helper,
     a thin pie chart wrapper, built-in regional country-code datasets
@@ -31,9 +31,9 @@ LazyData: true
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-05-21 15:53:06 UTC; User
+Packaged: 2026-05-22 14:24:58 UTC; User
 Author: Shanlong Ding [aut, cre] (ORCID:
-    <https://orcid.org/0000-0002-8831-1684>)
+    <https://orcid.org/0000-0001-9048-6670>)
 Maintainer: Shanlong Ding <dings@who.int>
 Repository: CRAN
-Date/Publication: 2026-05-21 16:12:05 UTC
+Date/Publication: 2026-05-23 11:22:45 UTC

@@ -1,7 +1,7 @@
-7a06e2d9cfffbf848104bc566bb23de7 *DESCRIPTION
+df8f4bfb4f65ca9b7b25de59ccb9aea8 *DESCRIPTION
 d42d133a5f4d9da276b7949d78b1d4fe *LICENSE
 6f7ca63c8e03706936e2f723eab4e088 *NAMESPACE
-e9dbb8abe138b9c9bf073d824de91825 *NEWS.md
+15eaf03806d0c014de0794cb4e423e0f *NEWS.md
 b0e72ab52e08e852e9daf4f39b09f6ea *R/DSIR-package.R
 45287e52192b2ee2d6107fe5e82c1aad *R/bind_indicators.R
 8dcb0059c42a6942c375ad72aef118b8 *R/clean_schema.R
@@ -32,8 +32,8 @@ f307821868092afdf558e1d1851a4a07 *demo/00Index
 6cb909dd6c524e83db0484d6969e5562 *inst/WORDLIST
 3108802429089327b95ef82853f48af2 *inst/doc/DSIR.R
 02fdf3d04e8fa3520194c422c20bc2a5 *inst/doc/DSIR.Rmd
-da1109464171944912e7330992b64fb0 *inst/doc/DSIR.html
-a175295f1b9a836d01edee624f5986eb *man/DSIR-package.Rd
+627119b4c7a62abad39397a40453d364 *inst/doc/DSIR.html
+3b31f8e6623c733d22d8bfe7707dc1a8 *man/DSIR-package.Rd
 b8dbd3543181c653d5910c23a05c4369 *man/bind_indicators.Rd
 716d9ebd3086cac212973651ea64f5e8 *man/dsi_flextable_defaults.Rd
 473797bfc62fc8b021e997ee709a1be9 *man/figures/logo.jpg
