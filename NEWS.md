@@ -2,6 +2,60 @@
 
 For full source, see <https://github.com/shanlong-who/DSIR>.
 
+# DSIR 0.9.0
+
+## New features
+
+* New `age_standardize()`: the directly age-standardized rate, with an
+  optional Fay-Feuer gamma confidence interval. Standard-population
+  weights may be supplied as counts, a standard million, or percentages
+  — they are normalised internally.
+
+* New dataset `who_std_pop`: the WHO World Standard Population (Ahmad et
+  al. 2001), as both the published percentages and the SEER standard
+  million, in 21 five-year age groups (`0-4` to `100+`). Aggregate it to
+  your own age groups and pass it to `age_standardize()`.
+
+* New `life_table()`: a period life table (qx, lx, dx, Lx, Tx, ex) from
+  age-specific mortality rates. Handles abridged and complete tables and
+  an open final interval, with Coale-Demeny West infant and child `ax`
+  by sex (overridable). Life expectancy at birth is `ex[1]`.
+
+* New `snapshot()`: evaluate an expression (typically a `gho_data()` /
+  `gho_clean()` pull) once, save the result to an `.rds` file, and read
+  it back on later runs so analyses re-run reproducibly and offline. An
+  empty result — the signature of an unreachable API — is never written,
+  so a failed refresh cannot destroy a good snapshot.
+
+* `who_countries` gains a `wb_income_group` column: the World Bank income
+  classification (fiscal year 2027; 2025 GNI per capita, Atlas method).
+  Cook Islands and Niue are `NA` as they are not World Bank economies.
+
+## Bug fixes
+
+* `sdg_data()` — and therefore `sdg_coverage()` — no longer errors when a
+  pull spans multiple pages whose nested `dimensions` / `attributes`
+  columns differ, which is the signature of a multi-series indicator
+  (each series is stratified by its own dimension set). Pages are now
+  combined with `vctrs::vec_rbind()`, which takes the union of the
+  nested columns and fills the cells missing from a page with `NA`,
+  where base `rbind()` failed with `duplicate 'row.names' are not
+  allowed` after a `provided k variables to replace 1 variables`
+  warning.
+
+* GHO and SDG requests now retry on connection-level failures (timeouts,
+  connection resets) and on transient server errors (HTTP 500 / 502 /
+  504, alongside the 429 / 503 `httr2` defaults). Previously only 429
+  and 503 were retried, so a single network hiccup — the typical symptom
+  of GHO API instability — failed the whole download despite the
+  configured `max_tries = 3`. The per-request timeout is also raised
+  from 20 to 30 seconds. Requires `httr2 (>= 1.0.0)`.
+
+* `sdg_coverage()` no longer errors on rows with a missing series code:
+  the per-group location/series values are read back from the data
+  instead of re-parsed out of the internal grouping key, and a genuine
+  `NA` series stays `NA` rather than becoming the string `"NA"`.
+
 # DSIR 0.8.0
 
 ## New features
