@@ -171,6 +171,37 @@ sdg_data("3.4.1", area = c("608", "250"))
 sdg_clean(sdg)
 
 ## -----------------------------------------------------------------------------
+raw <- sdg_data("3.8.2", area = "PHL")
+unique(raw$dimensions)
+sdg_clean(raw, keep_dimensions = TRUE)
+
+## -----------------------------------------------------------------------------
+sdg_data(
+  "3.8.2", area = "PHL",
+  series = "SH_OOP_XPD_EARNNET40",
+  dimensions = list(
+    Age = "ALLAGE", Location = "ALLAREA", Sex = "BOTHSEX",
+    Quantile = "_T", Type_of_household = "_T"
+  )
+) |>
+  sdg_clean(keep_dimensions = TRUE)
+
+## -----------------------------------------------------------------------------
+sdg_dimensions("3.8.2", include_attributes = TRUE)
+
+## -----------------------------------------------------------------------------
+detailed <- sdg_clean(raw, keep_dimensions = TRUE, keep_metadata = TRUE)
+detailed |>
+  select(any_of(c("iso3", "year", "value_num", "attr_units", "attr_nature", "data_source")))
+head(detailed$footnotes, 1L)
+
+## -----------------------------------------------------------------------------
+gho_detailed <- gho_data("FINANCIALHARDSHIP_PROPORTIONOFPOP", area = "PHL") |>
+  gho_clean(keep_dimensions = TRUE, keep_metadata = TRUE)
+gho_detailed |>
+  select(iso3, year, value_num, dim1_type, dim1, dim2_type, dim2)
+
+## -----------------------------------------------------------------------------
 # Two indicators on the same topic from different APIs:
 #   GHO NCDMORT3070 (probability of premature NCD mortality)
 #   SDG 3.4.1       (mortality rate from NCDs)

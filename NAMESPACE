@@ -23,13 +23,18 @@ export(sdg_areas)
 export(sdg_clean)
 export(sdg_coverage)
 export(sdg_data)
+export(sdg_dimensions)
 export(sdg_goals)
 export(sdg_indicators)
 export(sdg_targets)
 export(snapshot)
 export(theme_dsi)
 export(theme_dsi_facet)
-importFrom(rlang,"%||%")
-importFrom(rlang,.data)
-importFrom(tibble,as_tibble)
-importFrom(tibble,tibble)
+importFrom(rlang,
+  "%||%",
+  .data
+)
+importFrom(tibble,
+  as_tibble,
+  tibble
+)
