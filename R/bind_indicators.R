@@ -1,10 +1,10 @@
 #' Bind Cleaned Indicator Tibbles
 #'
 #' Combines two or more tibbles produced by [gho_clean()] or
-#' [sdg_clean()] into a single tibble. Because both cleaners output the
-#' same 15-column core schema, the result is a uniform table that can be
+#' [sdg_clean()] or [ghe_clean()] into a single tibble. All cleaners output the
+#' same 15-column core schema. The result is a uniform table that can be
 #' filtered, joined, or visualised without source-specific code paths;
-#' use the `source` column to tell GHO rows apart from SDG rows.
+#' use the `source` column to identify GHO, SDG and GHE rows.
 #'
 #' Inputs do not need to be in any particular order. `NULL` inputs are
 #' silently dropped, which makes it ergonomic to write code like
@@ -16,9 +16,13 @@
 #' from an input are filled with typed missing values. Binding rows
 #' does not harmonise dimension codes or indicator definitions across
 #' sources.
+#' `gho_clean(keep_metadata = TRUE)` retains a row-level `provider` column
+#' so legacy and xMart GHO observations remain distinguishable after binding.
+#' Binding does not merge the input `who_provenance` attributes; preserve raw
+#' pulls or snapshots when request-level provenance is needed.
 #'
 #' @param ... Two or more tibbles returned by [gho_clean()] or
-#'   [sdg_clean()] (or any data frame containing the core columns). `NULL`
+#'   [sdg_clean()] or [ghe_clean()] (or any data frame containing the core columns). `NULL`
 #'   arguments are dropped. Calling with no inputs — or only `NULL`
 #'   inputs — returns the empty 15-column tibble.
 #'
@@ -26,7 +30,7 @@
 #'   indicator schema (15 core columns), followed by any additional
 #'   columns in first-seen order. Row order is `c(input_1, input_2, ...)`,
 #'   preserving within-input order.
-#' @seealso [gho_clean()], [sdg_clean()].
+#' @seealso [gho_clean()], [sdg_clean()], [ghe_clean()].
 #' @export
 #'
 #' @examples
@@ -44,7 +48,7 @@ bind_indicators <- function(...) {
     if (!is.data.frame(dfs[[i]])) {
       cli::cli_abort(c(
         "Argument {i} must be a data frame, not {.cls {class(dfs[[i]])[1]}}.",
-        "i" = "All inputs should come from {.fn gho_clean} or {.fn sdg_clean}."
+        "i" = "All inputs should come from {.fn gho_clean}, {.fn sdg_clean} or {.fn ghe_clean}."
       ))
     }
   }
@@ -55,7 +59,7 @@ bind_indicators <- function(...) {
     if (length(missing_cols) > 0L) {
       cli::cli_abort(c(
         "Argument {i} is missing required column{?s}: {.val {missing_cols}}.",
-        "i" = "Did you forget to call {.fn gho_clean} or {.fn sdg_clean} first?"
+        "i" = "Did you forget to call {.fn gho_clean}, {.fn sdg_clean} or {.fn ghe_clean} first?"
       ))
     }
     # Keep the core first without discarding optional dimension columns.

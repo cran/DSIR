@@ -8,7 +8,7 @@ bind_indicators(...)
 }
 \arguments{
 \item{...}{Two or more tibbles returned by \code{\link[=gho_clean]{gho_clean()}} or
-\code{\link[=sdg_clean]{sdg_clean()}} (or any data frame containing the core columns). \code{NULL}
+\code{\link[=sdg_clean]{sdg_clean()}} or \code{\link[=ghe_clean]{ghe_clean()}} (or any data frame containing the core columns). \code{NULL}
 arguments are dropped. Calling with no inputs — or only \code{NULL}
 inputs — returns the empty 15-column tibble.}
 }
@@ -20,10 +20,10 @@ preserving within-input order.
 }
 \description{
 Combines two or more tibbles produced by \code{\link[=gho_clean]{gho_clean()}} or
-\code{\link[=sdg_clean]{sdg_clean()}} into a single tibble. Because both cleaners output the
-same 15-column core schema, the result is a uniform table that can be
+\code{\link[=sdg_clean]{sdg_clean()}} or \code{\link[=ghe_clean]{ghe_clean()}} into a single tibble. All cleaners output the
+same 15-column core schema. The result is a uniform table that can be
 filtered, joined, or visualised without source-specific code paths;
-use the \code{source} column to tell GHO rows apart from SDG rows.
+use the \code{source} column to identify GHO, SDG and GHE rows.
 }
 \details{
 Inputs do not need to be in any particular order. \code{NULL} inputs are
@@ -36,6 +36,10 @@ Additional columns, including named dimensions from
 from an input are filled with typed missing values. Binding rows
 does not harmonise dimension codes or indicator definitions across
 sources.
+\code{gho_clean(keep_metadata = TRUE)} retains a row-level \code{provider} column
+so legacy and xMart GHO observations remain distinguishable after binding.
+Binding does not merge the input \code{who_provenance} attributes; preserve raw
+pulls or snapshots when request-level provenance is needed.
 }
 \examples{
 \donttest{
@@ -45,5 +49,5 @@ bind_indicators(gho, sdg)
 }
 }
 \seealso{
-\code{\link[=gho_clean]{gho_clean()}}, \code{\link[=sdg_clean]{sdg_clean()}}.
+\code{\link[=gho_clean]{gho_clean()}}, \code{\link[=sdg_clean]{sdg_clean()}}, \code{\link[=ghe_clean]{ghe_clean()}}.
 }

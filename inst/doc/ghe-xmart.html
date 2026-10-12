@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>WHO xMart and Global Health Estimates</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">WHO xMart and Global Health Estimates</h1>
+
+
+
+<p>DSIR 0.11.0 keeps the legacy GHO OData service as its compatibility
+default and supports WHO’s public production xMart service through
+<code>backend = &#39;xmart&#39;</code>. GHE always uses xMart. Downloads never
+switch providers after a failure. Network examples below are shown
+without running during vignette builds.</p>
+<div id="discover-gho-codes-and-preserve-named-dimensions" class="section level2">
+<h2>Discover GHO codes and preserve named dimensions</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">gho_indicators</span>(<span class="st">&#39;mortality&#39;</span>, <span class="at">backend =</span> <span class="st">&#39;xmart&#39;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">gho_dimensions</span>(<span class="st">&#39;NCDMORT3070&#39;</span>, <span class="st">&#39;DIM_SEX&#39;</span>, <span class="at">backend =</span> <span class="st">&#39;xmart&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>ncd <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&#39;NCDMORT3070&#39;</span>, <span class="at">area =</span> <span class="st">&#39;PHL&#39;</span>, <span class="at">year_from =</span> <span class="dv">2020</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>                <span class="at">year_to =</span> <span class="dv">2021</span>, <span class="at">dimensions =</span> <span class="fu">list</span>(<span class="at">DIM_SEX =</span> <span class="st">&#39;TOTAL&#39;</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>                <span class="at">backend =</span> <span class="st">&#39;xmart&#39;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">gho_clean</span>(ncd, <span class="at">keep_dimensions =</span> <span class="cn">TRUE</span>, <span class="at">keep_metadata =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>The public directory identifies a published route and indicator
+identifier. Wide tables store named dimensions and numeric measure
+families; long tables store explicit dimension type/member pairs. DSIR
+maps both into its familiar raw columns. <code>gho_clean()</code> keeps
+15 columns by default. Optional named fields preserve category meaning;
+optional metadata preserves units and a row-level <code>provider</code>
+column. Raw GHO observations record <code>Provider</code> and a
+<code>who_provenance</code> attribute. Missing labels are resolved with
+the recorded backend, even if the session option has changed. Unknown
+imported origins remain <code>NA</code>. Positions can differ from
+legacy <code>Dim1</code>-<code>Dim3</code>. Prefer named filters.</p>
+<p>The xMart directory and old catalog cover different codes and
+publication vintages. An unknown code warns; it is never replaced by a
+similar code. All six GHO query functions accept <code>backend</code>.
+An explicit argument overrides <code>DSIR.who_backend</code> without
+changing that option; an unset option uses legacy. Use the same backend
+for code discovery, dimensions, counts, coverage and data.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>financial <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&#39;FINANCIALHARDSHIP_PROPORTIONOFPOP&#39;</span>, <span class="at">area =</span> <span class="st">&#39;PHL&#39;</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                       <span class="at">backend =</span> <span class="st">&#39;legacy&#39;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">gho_clean</span>(financial, <span class="at">keep_dimensions =</span> <span class="cn">TRUE</span>, <span class="at">keep_metadata =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Optional session default; explicit arguments still take precedence.</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">options</span>(<span class="at">DSIR.who_backend =</span> <span class="st">&#39;xmart&#39;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">gho_indicators</span>(<span class="st">&#39;mortality&#39;</span>, <span class="at">backend =</span> <span class="st">&#39;legacy&#39;</span>)</span></code></pre></div>
+<p>Successful empty observation selections give an informational
+message. <code>gho_has_data()</code> returns <code>FALSE</code> and
+<code>gho_count()</code> returns <code>0L</code> in that case. Requests
+or parsing failures warn and return empty tables or <code>NA</code>. An
+unknown xMart directory code warns. Legacy HTTP 404 responses trigger a
+small directory check before an indicator is reported absent. A failed
+directory check cannot establish absence. There is no automatic
+fallback.</p>
+</div>
+<div id="discover-ghe-selections" class="section level2">
+<h2>Discover GHE selections</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">ghe_dimensions</span>(<span class="st">&#39;year&#39;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">ghe_dimensions</span>(<span class="st">&#39;area&#39;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">ghe_dimensions</span>(<span class="st">&#39;sex&#39;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">ghe_dimensions</span>(<span class="st">&#39;age&#39;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">ghe_dimensions</span>(<span class="st">&#39;measure&#39;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">ghe_causes</span>(<span class="st">&#39;diabetes&#39;</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">ghe_causes</span>(<span class="st">&#39;stroke&#39;</span>)</span></code></pre></div>
+<p>Official year and sex references are small. Geography uses all-cause,
+all-age, both-sex observations in the latest year. Age and cause lists
+use a small slice for the first available WHO Member State in ISO3
+order. This avoids expensive whole-database grouping. These are
+discovery lists; <code>ghe_coverage()</code> verifies the actual
+selection. Some observed age codes have no label in the published age
+reference; their labels remain missing.</p>
+<p>Cause <code>level</code>, <code>cause_group</code>,
+<code>rankable</code> and <code>single_cause</code> come from the
+provider. It publishes no parent-code field; group codes are not
+parents. Do not sum a hierarchy total together with its descendants.</p>
+</div>
+<div id="download-selected-measures" class="section level2">
+<h2>Download selected measures</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>phl_deaths <span class="ot">&lt;-</span> <span class="fu">ghe_data</span>(<span class="st">&#39;PHL&#39;</span>, <span class="at">year =</span> <span class="dv">2023</span>, <span class="at">age =</span> <span class="st">&#39;TOTAL&#39;</span>, <span class="at">sex =</span> <span class="st">&#39;TOTAL&#39;</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                       <span class="at">cause =</span> <span class="dv">0</span>, <span class="at">measure =</span> <span class="st">&#39;deaths&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>phl_rates <span class="ot">&lt;-</span> <span class="fu">ghe_data</span>(<span class="st">&#39;PHL&#39;</span>, <span class="at">year =</span> <span class="dv">2023</span>, <span class="at">age =</span> <span class="st">&#39;Y40T44&#39;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                      <span class="at">sex =</span> <span class="fu">c</span>(<span class="st">&#39;FEMALE&#39;</span>, <span class="st">&#39;MALE&#39;</span>), <span class="at">cause =</span> <span class="dv">0</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                      <span class="at">measure =</span> <span class="st">&#39;death_rate&#39;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">ghe_coverage</span>(<span class="st">&#39;PHL&#39;</span>, <span class="at">age =</span> <span class="st">&#39;TOTAL&#39;</span>, <span class="at">sex =</span> <span class="st">&#39;TOTAL&#39;</span>, <span class="at">cause =</span> <span class="dv">0</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">ghe_clean</span>(phl_rates, <span class="at">keep_dimensions =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Counts are deaths or years, rates are per 100,000, and shares are
+percentages. Counts retain published uncertainty bounds. The API
+supplies no rate/share bounds: missing bounds are not filled by
+calculation. <code>TOTAL</code> age rates are crude; a selected
+five-year group gives an age-specific rate. Age aggregates can overlap:
+do not add every returned age group to obtain a total.</p>
+<p><code>measure = NULL</code> returns all supported measures as
+separate rows. The source-row count therefore differs from the length of
+the long result. Coverage counts source observations. All-null filters
+are rejected; more than one million source rows require narrower filters
+or an explicit <code>DSIR.who_max_rows</code> setting. Large filters use
+a text-body POST internally.</p>
+</div>
+<div id="reproducible-pulls-and-revised-estimates" class="section level2">
+<h2>Reproducible pulls and revised estimates</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>phl <span class="ot">&lt;-</span> <span class="fu">snapshot</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="fu">ghe_data</span>(<span class="st">&#39;PHL&#39;</span>, <span class="at">year =</span> <span class="dv">2023</span>, <span class="at">age =</span> <span class="st">&#39;TOTAL&#39;</span>, <span class="at">sex =</span> <span class="st">&#39;TOTAL&#39;</span>, <span class="at">cause =</span> <span class="dv">0</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>            <span class="at">measure =</span> <span class="st">&#39;deaths&#39;</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="st">&#39;data/phl_ghe_2023.rds&#39;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="fu">attr</span>(phl, <span class="st">&#39;who_provenance&#39;</span>)</span></code></pre></div>
+<p>Reference caches expire after ten minutes and remain in memory.
+<code>snapshot()</code> writes only to the path you choose. GHE releases
+can revise earlier years; the 2023 estimates published by WHO in 2026
+are not automatically comparable with the older 2021 release. DSIR uses
+<code>DEX_CMS/GHE_FULL</code>, not the older <code>GHE_FULL_FOCUS</code>
+or <code>GHE_FULL_DD</code> views.</p>
+</div>
+<div id="who-2026-standard-population" class="section level2">
+<h2>WHO 2026 standard population</h2>
+<p>Beginning with DSIR 0.11.0, <code>who_std_pop</code> uses the WHO
+2026 Standard Population. The official table has 18 groups through
+<code>85+</code>. Its rounded percentages sum to 100.02, so DSIR
+normalizes them to 100. <code>std_million</code> is a proportional
+numeric count scaled to one million, derived without integer
+rounding.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>who_std_pop</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; # A tibble: 18 × 4</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt;    age_group age_start weight std_million</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;         &lt;int&gt;  &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt;  1 0-4               0   7.21      72086.</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt;  2 5-9               5   7.13      71286.</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt;  3 10-14            10   7.11      71086.</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt;  4 15-19            15   7.12      71186.</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt;  5 20-24            20   7.15      71486.</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt;  6 25-29            25   7.08      70786.</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt;  7 30-34            30   6.89      68886.</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt;  8 35-39            35   6.66      66587.</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;  9 40-44            40   6.35      63487.</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; 10 45-49            45   6.04      60388.</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; 11 50-54            50   5.75      57489.</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; 12 55-59            55   5.41      54089.</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; 13 60-64            60   4.97      49690.</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; 14 65-69            65   4.43      44291.</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; 15 70-74            70   3.77      37692.</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; 16 75-79            75   2.98      29794.</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; 17 80-84            80   2.08      20796.</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; 18 85+              85   1.89      18896.</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>count <span class="ot">&lt;-</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(who_std_pop))</span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>population <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">10000</span>, <span class="fu">nrow</span>(who_std_pop))</span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="fu">age_standardize</span>(count, population, who_std_pop<span class="sc">$</span>weight)</span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; [1] 79.68206</span></span></code></pre></div>
+<p>The former object is replaced. Aggregate observed ages to the
+published groups before using its weights; no finer split of
+<code>0-4</code> or <code>85+</code> is supplied. Source: <a href="https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2023_who_standard_population.pdf">WHO/HSA/DDA/GHE/2026.4,
+Table 1, page 6</a>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

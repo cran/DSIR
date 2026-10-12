@@ -2,6 +2,62 @@
 
 For full source, see <https://github.com/shanlong-who/DSIR>.
 
+# DSIR 0.11.0
+
+## WHO data infrastructure
+
+* GHO retains the legacy OData API as its compatibility default and adds the
+  public production WHO xMart API. An internal
+  provider adapter maps the official indicator directory, download routes,
+  geography, numeric measure families and named dimensions to DSIR fields.
+  Existing arguments remain; `dimensions` adds exact named filters.
+  The public xMart directory covers a different set of codes and vintages
+  than the legacy catalog. Unknown codes warn; no automatic fallback occurs.
+* All six GHO query functions accept `backend = "legacy"` or `"xmart"`.
+  An explicit argument overrides `DSIR.who_backend` for that call without
+  changing the option; an unset option defaults to legacy. GHE always uses
+  xMart. `DSIR.who_base_url` accepts a compatible HTTPS xMart origin. Reference caches
+  are session-only, expire after ten minutes and are scoped to provider/host.
+* WHO downloads verify row counts, page consistency and unique identifiers.
+  Incomplete downloads are discarded. Long filters use the public `/$query`
+  POST endpoint. Compact list filters and batched dimension discovery respect
+  the production query limits. A source-row limit prevents accidental bulk pulls.
+* xMart queries retry HTTP 200 HTML error pages within the existing three-attempt
+  limit. If the service still returns HTML, the warning identifies a service
+  failure rather than a JSON parsing problem. Failed catalogs are not cached.
+* `gho_clean(keep_dimensions = TRUE)` retains named xMart dimensions in
+  addition to dimension types. Metadata retention adds units, measure fields
+  and a row-level `provider` column. Both GHO backends record retrieval
+  provenance; cleaning resolves missing labels with the recorded provider,
+  even after the session default changes. Unknown imported origins stay `NA`.
+  The default remains the unified 15-column core.
+* GHO distinguishes absent directory codes, successful empty selections, and
+  request or parsing failures. Legacy HTTP 404 responses trigger a small
+  directory check before a code is reported absent. Valid empty observations
+  produce an informational message; failures warn and retain empty/NA contracts.
+
+## Global Health Estimates
+
+* Add `ghe_data()`, `ghe_causes()`, `ghe_dimensions()`, `ghe_coverage()` and
+  `ghe_clean()`, using `DEX_CMS/GHE_FULL`. Exact geography, year, sex, age,
+  cause and friendly measure filters preserve uncertainty bounds and hierarchy.
+  Cause grouping is not presented as a parent identifier. Rates do not invent
+  uncertainty bounds. Named context can be retained when binding cleaned data.
+* Discovery uses official references and small filtered code-list slices,
+  avoiding expensive grouping of the full GHE database. Live tests require
+  explicit opt-in and are skipped on CRAN.
+* Vignette network examples are displayed without execution by default.
+  This keeps package builds independent of temporary API availability.
+
+## Standard population: intentional behavior change
+
+* Beginning with DSIR 0.11.0, `who_std_pop` uses the WHO 2026 Standard
+  Population (WHO/HSA/DDA/GHE/2026.4, Table 1). Its 18 groups run from `0-4`
+  to `85+`. Published percentages sum to 100.02 and are explicitly normalized
+  to 100; the derived standard million sums to 1,000,000 without integer
+  rounding. The four column names remain, but `std_million` is now numeric.
+  No old population object is retained. Align input ages before standardizing.
+
 # DSIR 0.10.0
 
 ## New features
@@ -66,10 +122,8 @@ For full source, see <https://github.com/shanlong-who/DSIR>.
   weights may be supplied as counts, a standard million, or percentages
   — they are normalised internally.
 
-* New dataset `who_std_pop`: the WHO World Standard Population (Ahmad et
-  al. 2001), as both the published percentages and the SEER standard
-  million, in 21 five-year age groups (`0-4` to `100+`). Aggregate it to
-  your own age groups and pass it to `age_standardize()`.
+* New dataset `who_std_pop` for direct age standardization. Its weights
+  and age groups are replaced by the WHO 2026 standard in version 0.11.0.
 
 * New `life_table()`: a period life table (qx, lx, dx, Lx, Tx, ex) from
   age-specific mortality rates. Handles abridged and complete tables and

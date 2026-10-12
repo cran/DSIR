@@ -46,12 +46,35 @@
   for (i in seq_len(3L)) {
     out[[paste0("dim", i, "_type")]] <- .dsi_pick_chr(df, paste0("Dim", i, "Type"))
   }
+  fields <- grep('^DIM_', names(df), value = TRUE)
+  for (field in fields) {
+    out[[paste0('dim_', tolower(sub('^DIM_', '', field)))]] <- .dsi_pick_chr(df, field)
+  }
   out
 }
 
 
 #' @noRd
+.gho_provider <- function(df) {
+  provider <- .dsi_pick_chr(df, 'Provider')
+  if ('Provider' %in% names(df)) {
+    provider[!provider %in% c('legacy', 'xmart')] <- NA_character_
+    return(provider)
+  }
+  provenance <- attr(df, 'who_provenance')
+  if (is.list(provenance) && length(provenance$backend) == 1L &&
+      is.character(provenance$backend) && provenance$backend %in% c('legacy', 'xmart')) {
+    missing <- is.na(provider)
+    provider[missing] <- provenance$backend
+  }
+  provider
+}
+
+
+#' @noRd
 .gho_append_metadata <- function(out, df) {
+  # Unknown imported data retain NA: the current option is not its origin.
+  out$provider <- .gho_provider(df)
   mapping <- c(
     observation_id = "Id", spatial_type = "SpatialDimType",
     time_type = "TimeDimType", data_source_type = "DataSourceDimType",
@@ -62,5 +85,10 @@
   )
   for (nm in names(mapping)) out[[nm]] <- .dsi_pick_chr(df, mapping[[nm]])
   out$footnotes <- .dsi_pick_list(df, "Comments")
+  for (field in intersect(c('Unit', 'MeasureField'), names(df))) {
+    out[[if (field == 'Unit') 'unit' else 'measure_field']] <- .dsi_pick_chr(df, field)
+  }
+  if ('SpatialDimTypeOriginal' %in% names(df)) out$spatial_type_source <- .dsi_pick_chr(df, 'SpatialDimTypeOriginal')
+  attr(out, 'who_provenance') <- attr(df, 'who_provenance')
   out
 }

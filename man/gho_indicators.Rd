@@ -4,7 +4,7 @@
 \alias{gho_indicators}
 \title{List GHO Indicators}
 \usage{
-gho_indicators(search = NULL)
+gho_indicators(search = NULL, backend = NULL)
 }
 \arguments{
 \item{search}{Optional character. Search keywords matched against
@@ -18,12 +18,17 @@ gho_indicators(search = NULL)
 (whitespace inside an element is treated as part of the term).
 }
 
-Single quotes in any term are escaped for the OData filter.}
+Search terms are matched literally; they are not download identifiers.}
+
+\item{backend}{Character scalar. \code{"legacy"} or \code{"xmart"}. Default \code{NULL}
+uses the \code{DSIR.who_backend} option, or \code{"legacy"} when that option is
+unset. An explicit argument overrides the option for this call without
+changing it. Use the same backend for discovery and retrieval.}
 }
 \value{
 A \link[tibble:tibble]{tibble} with columns \code{IndicatorCode},
 \code{IndicatorName} and \code{Language}. Returns an empty tibble (with
-a message) when the service is unreachable.
+a warning) when the service is unreachable.
 }
 \description{
 Fetches the catalog of indicators from the WHO Global Health
