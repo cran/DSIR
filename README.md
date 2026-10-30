@@ -1,4 +1,4 @@
-# DSIR <a href="https://shanlong-who.github.io/DSIR/"><img src="man/figures/logo.jpg" align="right" height="120" alt="DSIR website" /></a>
+# DSIR <a href="https://shanlong-who.github.io/DSIR/"><img src="man/figures/logo.png" align="right" height="120" alt="DSIR website" /></a>
 
 > Data Science Infrastructure for Global Health
 
@@ -10,20 +10,22 @@
 <!-- badges: end -->
 
 An R package for global-health data work. Bundles country metadata
-and lightweight clients for the [WHO Global Health Observatory][gho]
-and [UN Sustainable Development Goals][sdg] APIs, plus reusable
+and lightweight clients for the [WHO Global Health Observatory][gho],
+[WHO Global Health Estimates][ghe] and [UN Sustainable Development Goals][sdg]
+APIs, plus reusable
 WHO-style themes for `ggplot2` and `flextable` so that charts and
 tables produced from this data look consistent across reports.
 
 [gho]: https://www.who.int/data/gho
+[ghe]: https://www.who.int/data/gho/data/themes/mortality-and-global-health-estimates
 [sdg]: https://unstats.un.org/sdgs
 
 Documentation: <https://shanlong-who.github.io/DSIR/>
 
 ## Installation
 
-Version 0.11.0 is available from GitHub. This update has not been submitted
-to CRAN.
+Version **0.11.0** is available on [CRAN](https://CRAN.R-project.org/package=DSIR),
+published on **12 October 2026**.
 
 ```r
 # from CRAN
@@ -33,6 +35,42 @@ install.packages("DSIR")
 # install.packages("remotes")
 remotes::install_github("shanlong-who/DSIR")
 ```
+
+## What's new in 0.13.0 (GitHub)
+
+- **xMart-first GHO queries:** the default `backend = "auto"` tries legacy only
+  for codes missing from the xMart directory or indicators verified to have no
+  observations at all. Filtered empty results and request failures do not switch
+  providers. Fallback warns and records the actual provider and reason.
+- **Explicit provider controls:** pin `backend = "xmart"` or `"legacy"` for
+  reproducible analysis. Automatic selection never combines data releases or
+  translates provider-specific dimension filters. Legacy discovery has a dated
+  bundled catalog available when its online requests fail.
+
+## Added in 0.12.0 (GitHub)
+
+- **Source update timestamps:** use `gho_last_updated()` for one GHO indicator
+  with the existing legacy/xMart backend rules, and `sdg_last_updated()` for
+  the whole UN SDG database. Results preserve the original time string and
+  distinguish successful, unavailable and failed timestamp queries.
+
+## What's new in 0.11.0
+
+- **Global Health Estimates:** retrieve deaths, rates and disease-burden
+  measures by country, year, sex, age and cause; explore codes and coverage.
+- **GHO backend choice:** select `backend = "legacy"` or `"xmart"` for each
+  request. In 0.11.0, legacy was the compatibility default; 0.13.0 adds the
+  automatic selection described below.
+- **More data context:** optionally retain named xMart dimensions, units and
+  provider information. The default cleaned output still has 15 columns.
+- **WHO 2026 Standard Population:** `who_std_pop` now has 18 age groups from
+  `0-4` to `85+`. Align input age groups before rerunning age standardization.
+- **Reliable package builds:** live API examples are displayed without
+  execution during default vignette builds.
+
+See the [release notes](https://shanlong-who.github.io/DSIR/news/index.html)
+and [WHO xMart and GHE guide](https://shanlong-who.github.io/DSIR/articles/ghe-xmart.html)
+for examples and migration details.
 
 ## Features
 
@@ -155,6 +193,8 @@ ggplot(mtcars, aes(factor(cyl))) +
 
 **`dsi_flextable_defaults()`** — one-line setup for `flextable`
 formatting (booktabs style, bold headers, paddings).
+`flextable` (>= 0.9.0) is optional; install it with
+`install.packages("flextable")` before using this helper.
 
 ```r
 dsi_flextable_defaults()
@@ -171,6 +211,34 @@ ggpie(df, "region", "countries", .offset = 1.2)
 ```
 
 ### Utilities
+
+**`data_snapshot()` / `compare_snapshots()` (development)** — save complete
+GHO observations and query context to a local RDS file, then compare two
+extracts offline. Matching uses the full geographical, temporal and dimension
+key. Incompatible backends, query scopes or unit/measure definitions stop the
+comparison; value changes and metadata-only changes are reported separately.
+
+```r
+# Repeat exactly the same query later, using the same backend.
+old_data <- gho_data("WHS4_100", area = "PHL", backend = "xmart")
+data_snapshot(old_data, file = "snapshots/gho_old.rds")
+
+new_data <- gho_data("WHS4_100", area = "PHL", backend = "xmart")
+data_snapshot(new_data, file = "snapshots/gho_new.rds")
+
+result <- compare_snapshots("snapshots/gho_old.rds", "snapshots/gho_new.rds")
+result$summary
+result$modified
+```
+
+Existing files are protected by default. For locally filtered or imported
+data, declare the complete `scope`; raw GHO data are preferred to the default
+15-column cleaned output. A provider timestamp, retrieval time, UTC snapshot
+creation time and latest observation year are different concepts. Differences
+between extracts do not establish when or why WHO revised data. See the
+[offline snapshot tutorial](vignettes/data-snapshots.Rmd) for a reproducible
+simulation and the full comparison contract. The existing `snapshot()`
+expression cache remains available.
 
 **`geomean()`** — geometric mean, with optional weights. Useful for
 aggregating ratio-based health indicators where the composite is
@@ -219,7 +287,62 @@ gho_count("WHOSIS_000001", area = wpro_cty)
 gho_coverage("WHOSIS_000001", area = c("FRA", "DEU", "JPN"))
 ```
 
+**Check an indicator's timestamp (experimental).** `gho_last_updated()` requests
+the latest non-missing observation timestamp across all locations, years
+and dimensions. It follows the same backend selection rules as `gho_data()`:
+an explicit `backend` overrides `DSIR.who_backend`, with `"auto"` as the
+default when neither is set. Missing timestamps or failed requests do not
+trigger fallback; automatic selection checks observation availability first.
+
+```r
+gho_last_updated("WHS4_100")
+gho_last_updated("WHS4_100", backend = "xmart")
+gho_last_updated("WHS4_100", backend = "xmart", diagnostics = TRUE)
+
+# Optional sequential queries for a small set of indicators.
+codes <- c("WHS4_100", "NCDMORT3070")
+updates <- lapply(codes, gho_last_updated, backend = "legacy")
+do.call(rbind, updates)
+```
+
+The `updated` character column preserves the source timestamp, including
+any offset or unspecified time zone. `timestamp_field` identifies `Date`
+(legacy) or `Sys_CommitDateUtc` (xMart); neither is a formal publication
+date or the latest observation year. Each result has one row, with
+`status = "ok"`, `"not_available"` (no timestamp supplied), or `"failed"`
+(lookup, request or response validation failed). `checked_at` is the UTC
+query start time. Whole-catalog queries can take considerable time because
+each indicator needs a date request and transient failures are retried.
+
+`diagnostics = TRUE` appends `reason`, `stage`, `http_status`,
+`timestamp_kind`, `provider_route` and `provider_indicator`; the default
+eight columns stay unchanged. `directory_not_listed` means a successfully
+read directory does not list the code, rather than proving it invalid.
+`http_error` and `request_failed` identify HTTP and connection failures;
+`timestamp_field_missing` and `timestamp_missing` identify a missing field
+and a response with no non-missing timestamp. Diagnostics make no extra
+requests and do not suppress warnings or switch backends.
+
+xMart's `Sys_CommitDateUtc` records a system commit that can reflect data
+processing. DSIR has not established that legacy `Date` records an official
+modification or publication date. Shared timestamps do not prove that several
+indicators' values changed together. `checked_at` is the UTC check start,
+not a source modification or observation retrieval time. Use
+`data_snapshot()` and `compare_snapshots()` to detect actual differences
+between retrieved observations.
+
 **Fetch and clean.** The typical workflow is **search → fetch → clean**:
+
+`gho_indicators()` searches xMart when `backend = "auto"`. Keyword searches
+cannot establish that an individual indicator is absent, so they do not switch
+catalogs. Select `backend = "legacy"` for legacy-only codes. If a legacy GHO
+request fails, it searches the bundled legacy catalog and warns with its
+collection date. `attr(result, "catalog_snapshot")` records the snapshot's
+source and UTC collection time. The snapshot may omit new codes or contain
+outdated names; it does not confirm that observations are available. Successful
+empty searches do not trigger fallback. xMart never uses the legacy snapshot.
+Search matches names literally: use `"UHC service coverage"`, not the abbreviation
+`"UHC SCI"`, to find names containing those words.
 
 ```r
 # Search indicators by keyword
@@ -273,8 +396,8 @@ gho_detailed |>
 ```
 
 As verified on 2026-10-06, this financial-hardship code is absent from the
-public xMart directory. The example explicitly selects the legacy provider;
-there is no automatic fallback. The UN SDG workflow below remains separate.
+public xMart directory. The example fixes the legacy provider explicitly.
+The UN SDG workflow below remains separate.
 
 `keep_metadata = TRUE` also preserves the retrieval `provider`, observation identifier,
 source code and type, spatial/time types, parent location, update
@@ -285,6 +408,19 @@ an indicator name or code prefix. Both options default to `FALSE`.
 ### UN SDG API
 
 Same pattern as GHO: **search → fetch → clean**.
+
+`sdg_last_updated()` queries the update timestamp of the **whole database**:
+
+```r
+sdg_last_updated()
+```
+
+It returns the same columns and status values as `gho_last_updated()`, with
+`scope = "database"` and missing `indicator` and `backend` fields. The UN
+endpoint accepts no indicator or series filter, so this date does not mean
+that every indicator changed then. Series release codes and metadata-document
+update dates are not data update timestamps. Source time zones are preserved;
+an unspecified time zone is not assumed to be UTC.
 
 ```r
 # Browse goals, targets, indicators, and geographic areas
@@ -452,14 +588,35 @@ that pre-flight checks add little value.
 
 MIT — © 2026 Shanlong Ding
 
-### WHO xMart migration (0.11.0)
+### WHO backend selection (0.13.0)
 
-GHO keeps the legacy OData API as its compatibility default. Select
-`backend = "xmart"` to use `https://xmart-api-public.who.int` for one call.
-Its official directory supplies public download routes; DSIR maps them into
-its familiar observation fields. The 15-column default of `gho_clean()`
-remains unchanged. Public codes and published vintages can differ between
-providers. Use the same backend for discovery and retrieval.
+GHO defaults to `backend = "auto"`, preferring the public xMart API at
+`https://xmart-api-public.who.int`. Before filtering, automatic indicator queries
+read its directory and make a bounded availability request (at most one row)
+for the entire indicator. The same selection rules apply to data, counts,
+availability, coverage, dimension discovery and update timestamps:
+
+| xMart result | Automatic behavior |
+| --- | --- |
+| Exact code absent from a successfully read, non-empty directory | Try legacy, with a warning |
+| Verified zero observations for the entire indicator | Try legacy, with a warning |
+| Indicator has observations, but requested filters match none | Keep the valid empty xMart result |
+| HTTP, transport, parsing, schema or route failure | Report failure; do not switch |
+| Only some countries or years are available | Return xMart coverage; do not fill gaps from legacy |
+
+Fallback preserves known WHO ISO3/region codes and year filters. Named
+dimensions, positional `dim1`-`dim3` filters and M49/native geography codes block
+fallback because equivalent filters have not been established. Dimension
+discovery can fall back only for `SpatialDim`, `SpatialDimType`, `TimeDim` and
+`TimeDimType`. Blocked fallback warns and returns empty/NA without dropping
+filters. Use an explicit backend with its native conventions in these cases.
+
+Each automatic result records the actual backend, `requested_backend = "auto"`
+and any `fallback_reason` in `attr(result, "who_provenance")`; this also applies
+to scalar counts and availability results. Raw observations retain `Provider`.
+No result combines providers. Decisions are checked afresh on subsequent calls.
+Pin a backend for repeated analysis, since provider coverage and published
+estimates may change. The 15-column default of `gho_clean()` is unchanged.
 
 ```r
 gho_indicators('mortality', backend = 'xmart')
@@ -492,7 +649,7 @@ the session option has changed since retrieval.
 Failures warn and return empty results without switching providers. Reference
 lookups use a ten-minute memory cache. No keys, startup requests or disk cache
 are required. Selection follows: explicit `backend` argument, then the
-`DSIR.who_backend` option, then `"legacy"`. An argument never changes the
+`DSIR.who_backend` option, then `"auto"`. An argument never changes the
 session option. To choose a session default once, use
 `options(DSIR.who_backend = "xmart")`. Other advanced settings are
 `DSIR.who_base_url` (xMart HTTPS origin), `DSIR.who_page_size` and

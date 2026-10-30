@@ -1,11 +1,11 @@
 # WHO provider configuration and read-only OData transport. No disk cache.
 .who_config <- function(backend = NULL) {
   from_option <- is.null(backend)
-  if (from_option) backend <- getOption('DSIR.who_backend', 'legacy')
+  if (from_option) backend <- getOption('DSIR.who_backend', 'auto')
   if (!is.character(backend) || length(backend) != 1L || is.na(backend) ||
-      !backend %in% c('xmart', 'legacy')) {
-    if (from_option) cli::cli_abort('Option {.code DSIR.who_backend} must be "xmart" or "legacy".')
-    cli::cli_abort('{.arg backend} must be "xmart" or "legacy".')
+      !backend %in% c('auto', 'xmart', 'legacy')) {
+    if (from_option) cli::cli_abort('Option {.code DSIR.who_backend} must be "auto", "xmart" or "legacy".')
+    cli::cli_abort('{.arg backend} must be "auto", "xmart" or "legacy".')
   }
   base <- getOption('DSIR.who_base_url', 'https://xmart-api-public.who.int')
   if (!is.character(base) || length(base) != 1L || is.na(base) ||
@@ -82,17 +82,21 @@
   } else .dsi_request(paste0(url, '?', encoded), retry_on_html = TRUE)
   cli::cli_inform('Fetching WHO: {.val {path}}')
   resp <- tryCatch(httr2::req_perform(req), error = function(e) {
+    .dsi_update_request_error(e)
     msg <- conditionMessage(e)
     cli::cli_warn(c('WHO request failed; no observations returned.', 'x' = '{msg}'))
     NULL
   })
   if (is.null(resp)) return(NULL)
+  .dsi_update_note(http_status = as.integer(httr2::resp_status(resp)))
   if (httr2::resp_content_type(resp) %in% c('text/html', 'application/xhtml+xml')) {
+    .dsi_update_note(reason = 'unexpected_content')
     cli::cli_warn(c('WHO API returned an HTML page instead of JSON; no observations returned.',
       'i' = 'The service may be temporarily unavailable. Retry later; this is not a valid empty data result.'))
     return(NULL)
   }
   tryCatch(httr2::resp_body_json(resp, simplifyVector = TRUE), error = function(e) {
+    .dsi_update_note(reason = 'invalid_json')
     msg <- conditionMessage(e)
     cli::cli_warn(c('WHO response could not be parsed as JSON.', 'x' = '{msg}'))
     NULL

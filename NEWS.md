@@ -2,7 +2,65 @@
 
 For full source, see <https://github.com/shanlong-who/DSIR>.
 
-# DSIR 0.11.0
+# DSIR 0.13.0 (2026-10-30)
+
+* Reference WHO's official GHO API documentation in DESCRIPTION instead of
+  the unavailable legacy API root URL. Retrieval behavior is unchanged.
+
+* **Default backend change:** GHO queries now use `backend = "auto"` unless
+  overridden by an argument or `DSIR.who_backend`. Automatic selection prefers
+  xMart and tries legacy only when a successful directory omits the exact code
+  or a bounded whole-indicator query verifies zero observations. HTTP, parsing
+  and schema failures, empty filtered selections and partial coverage do not
+  trigger fallback. Explicit `"legacy"` and `"xmart"` retain fixed-provider behavior.
+* Automatic selection is shared by data, count, availability, coverage,
+  dimension and timestamp queries. Fallback warns, records the actual provider
+  and reason, and never combines releases. Named/positional dimension filters,
+  native/M49 areas and provider-specific dimension columns block fallback.
+  Keyword discovery in auto mode uses xMart only; legacy discovery remains
+  explicit. GHE stays on xMart. Use explicit providers for reproducible analyses.
+
+* Bundle a dated legacy GHO indicator catalog for `gho_indicators()` to search
+  when online requests or parsing fail. Fallback warns with the collection
+  date and records snapshot provenance without caching it as a live catalog.
+  Successful empty searches and the xMart backend keep their existing behavior.
+
+* Move `flextable` (>= 0.9.0) from Imports to Suggests. Only
+  `dsi_flextable_defaults()` requires it at runtime and now provides
+  installation guidance when it is missing or too old. Examples, demos
+  and tests handle the optional dependency.
+
+* Mark `gho_last_updated()` experimental and add opt-in structured diagnostics
+  for directory omissions, HTTP/transport failures and unavailable timestamps.
+  Preserve its default eight columns, backend precedence and fail-soft behavior.
+  Clarify system commit, legacy observation, query and publication times.
+* Keep the hexagonal DSIR logo and sleeping-cat icons in PNG only, update
+  website icon links, and remove assistant skill bundles and local artifacts
+  that are not needed to maintain the package.
+
+* Add `data_snapshot()` for offline RDS snapshots of already retrieved GHO
+  observations, preserving complete input rows, dimension identity, declared
+  or recorded query scope, provider provenance and distinct creation/retrieval
+  times. Existing `snapshot()` caching behavior is unchanged.
+* Add `compare_snapshots()` for offline added, removed, modified and unchanged
+  observations. Full semantic keys, backend/query/units compatibility checks,
+  explicit metadata-only changes, original old/new rows, numeric deltas and
+  an exact-by-default tolerance protect against misleading comparisons.
+  Provider timestamps do not establish an official revision date.
+
+# DSIR 0.12.0 (2026-10-28)
+
+* Add `gho_last_updated()` for the latest non-missing observation timestamp
+  of one GHO indicator. It supports legacy (`Date`) and xMart
+  (`Sys_CommitDateUtc`), follows the existing backend selection rules,
+  and requests one ordered date row rather than all observations.
+* Add `sdg_last_updated()` for the database-level timestamp reported by
+  the UN SDG V5 API. Both helpers return one row with the original time
+  string, query scope, timestamp field, query time and an explicit status.
+  Missing timestamps and failed requests remain distinct. These timestamps
+  are not observation years or interchangeable publication dates.
+
+# DSIR 0.11.0 (2026-10-12)
 
 ## WHO data infrastructure
 

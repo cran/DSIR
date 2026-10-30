@@ -20,19 +20,42 @@ gho_indicators(search = NULL, backend = NULL)
 
 Search terms are matched literally; they are not download identifiers.}
 
-\item{backend}{Character scalar. \code{"legacy"} or \code{"xmart"}. Default \code{NULL}
-uses the \code{DSIR.who_backend} option, or \code{"legacy"} when that option is
+\item{backend}{Character scalar. \code{"auto"}, \code{"xmart"} or \code{"legacy"}. Default \code{NULL}
+uses the \code{DSIR.who_backend} option, or \code{"auto"} when that option is
 unset. An explicit argument overrides the option for this call without
 changing it. Use the same backend for discovery and retrieval.}
 }
 \value{
 A \link[tibble:tibble]{tibble} with columns \code{IndicatorCode},
-\code{IndicatorName} and \code{Language}. Returns an empty tibble (with
-a warning) when the service is unreachable.
+\code{IndicatorName} and \code{Language}. On a legacy request or parsing failure,
+searches a bundled catalog snapshot and warns with its collection date.
+The \code{catalog_snapshot} attribute records its \code{backend}, \code{source} URL and
+\code{retrieved} UTC time. The xMart backend still returns an empty tibble
+with a warning when its service is unreachable.
 }
 \description{
 Fetches the catalog of indicators from the WHO Global Health
 Observatory (GHO) OData API.
+}
+\details{
+With \code{backend = "auto"}, discovery searches the xMart directory only.
+A keyword search cannot prove that an individual indicator is absent.
+Use \code{backend = "legacy"} to inspect legacy-only codes or use the bundled
+legacy catalog during an outage. Neither an empty xMart search nor an
+xMart request failure switches the catalog source.
+
+Online results are preferred. The bundled legacy catalog is refreshed with
+package releases and may omit new indicators or contain outdated names and
+codes. It is used only after a failed or malformed response, not after a
+successful search with no matches. Fallback searches preserve literal,
+case-insensitive AND matching on indicator names; abbreviations such as
+\code{"SCI"} are not expanded to \code{"Service Coverage Index"}.
+
+The snapshot is not used for xMart or to verify observation availability.
+Downloading observations still requires a working online service. Snapshot
+results are not cached as a successful online catalog, so later calls can
+retry. Rebuild the snapshot using \code{data-raw/gho_indicators.R} in the source
+repository before a package release.
 }
 \examples{
 \donttest{

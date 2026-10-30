@@ -1,5 +1,7 @@
 ## ----include = FALSE----------------------------------------------------------
 run_live <- identical(Sys.getenv('DSIR_BUILD_LIVE_VIGNETTE'), 'true')
+run_tables <- run_live && requireNamespace("flextable", quietly = TRUE) &&
+  package_version(getNamespaceVersion("flextable")) >= "0.9.0"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment  = "#>", 
@@ -49,6 +51,18 @@ iso3_to_m49(c("phl", "PRI"))
 
 ## ----eval = run_live----------------------------------------------------------
 # gho_coverage("WHOSIS_000001", area = c("FRA", "DEU", "JPN"))
+
+## ----eval = FALSE-------------------------------------------------------------
+# gho_last_updated("WHS4_100")
+# gho_last_updated("WHS4_100", backend = "xmart")
+# gho_last_updated("WHS4_100", backend = "xmart", diagnostics = TRUE)
+# 
+# updates <- lapply(c("WHS4_100", "NCDMORT3070"), gho_last_updated,
+#                   backend = "legacy")
+# do.call(rbind, updates)
+
+## ----eval = FALSE-------------------------------------------------------------
+# sdg_last_updated()
 
 ## ----eval = run_live----------------------------------------------------------
 # gho_indicators("UHC") |> head()
@@ -133,7 +147,7 @@ geomean(c(0.6, 0.8, 0.95), w = c(2, 1, 1))
 #   labs(title = "UHC SCI, PIC — with custom strip colour",
 #        x = NULL, y = "SCI")
 
-## ----eval = run_live----------------------------------------------------------
+## ----eval = run_tables--------------------------------------------------------
 # library(flextable)
 # dsi_flextable_defaults(font_family = "Geogria")
 # 

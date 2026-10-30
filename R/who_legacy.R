@@ -1,12 +1,44 @@
-# Legacy GHO adapter is the compatibility default.
-# Backend selection is explicit; requests never fall back between providers.
+# Legacy GHO adapter. Automatic selection is handled by the shared dispatcher;
+# an explicit legacy request always stays on this provider.
+.legacy_gho_last_updated <- function(indicator) {
+    out <- .dsi_update_result("gho", "legacy", "indicator", indicator, "Date")
+    .dsi_update_note(stage = "timestamp", reason = "lookup_failed",
+        http_status = NA_integer_, provider_route = paste0("api/", indicator),
+        provider_indicator = indicator)
+    url <- .gho_build_url(utils::URLencode(indicator, reserved = TRUE),
+                          top = 1L, select = "Date")
+    url <- paste0(url, "&$filter=Date%20ne%20null&$orderby=Date%20desc")
+    resp <- .legacy_gho_request(url, indicator)
+    if (is.null(resp)) return(out)
+    parsed <- .dsi_update_json(resp, "GHO")
+    if (is.null(parsed)) return(out)
+    .dsi_update_row(out, parsed$value)
+}
+
 .legacy_gho_indicators <- function(search = NULL) {
     url <- .gho_indicators_build_url(search)
     res <- .gho_get(url)
-    if (is.null(res) || nrow(res) == 0L) {
+    if (is.null(res)) return(.gho_bundled_catalog(search))
+    if (nrow(res) == 0L) {
         return(tibble::tibble(IndicatorCode = character(), IndicatorName = character(), Language = character()))
     }
+    if (!all(c("IndicatorCode", "IndicatorName", "Language") %in% names(res))) {
+        cli::cli_warn("Malformed GHO indicator catalog received.")
+        return(.gho_bundled_catalog(search))
+    }
     res[, c("IndicatorCode", "IndicatorName", "Language")]
+}
+
+.gho_bundled_catalog <- function(search = NULL) {
+    snapshot <- readRDS(system.file("extdata", "gho-indicators.rds", package = "DSIR"))
+    date <- substr(snapshot$retrieved, 1L, 10L)
+    cli::cli_warn(c(
+        "Using the bundled legacy GHO indicator catalog collected on {date} (UTC).",
+        "i" = "Names and codes may be outdated. This snapshot does not establish current data availability."
+    ))
+    out <- .who_search(snapshot$catalog, "IndicatorName", search)
+    attr(out, "catalog_snapshot") <- snapshot[c("backend", "source", "retrieved")]
+    out
 }
 
 .legacy_gho_data <- function(indicator, spatial_type = NULL, area = NULL, year_from = NULL, year_to = NULL,
@@ -215,7 +247,7 @@
 #' @noRd
 .legacy_gho_request <- function(url, indicator = NULL) {
   cli::cli_inform("Fetching: {.url {url}}")
-  tryCatch(
+  resp <- tryCatch(
     httr2::req_perform(.dsi_request(url)),
     error = function(e) {
       # Only a 404 triggers a small directory probe. A service failure must
@@ -227,16 +259,22 @@
           utils::URLencode(filter, reserved = TRUE), '&$top=1&$select=IndicatorCode')
         catalog <- .gho_get(catalog_url)
         if (!is.null(catalog) && !nrow(catalog)) {
+          .dsi_update_note(stage = 'directory', reason = 'directory_not_listed')
           cli::cli_warn(c('GHO indicator code is absent from the legacy directory: {.val {indicator}}.',
             'i' = 'This is not a valid empty observation selection. Use {.fn gho_indicators} with {.code backend = "legacy"} to inspect current codes.'))
           return(NULL)
         }
       }
+      .dsi_update_request_error(e)
       msg <- conditionMessage(e)
       cli::cli_warn(c('GHO request failed.', 'i' = 'URL: {.url {url}}', 'x' = '{msg}'))
       NULL
     }
   )
+  if (!is.null(resp)) {
+    .dsi_update_note(http_status = as.integer(httr2::resp_status(resp)))
+  }
+  resp
 }
 
 

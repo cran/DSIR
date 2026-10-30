@@ -9,6 +9,8 @@ vignette: >
 
 ```{r, include = FALSE}
 run_live <- identical(Sys.getenv('DSIR_BUILD_LIVE_VIGNETTE'), 'true')
+run_tables <- run_live && requireNamespace("flextable", quietly = TRUE) &&
+  package_version(getNamespaceVersion("flextable")) >= "0.9.0"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment  = "#>", 
@@ -22,7 +24,7 @@ library(dplyr)
 library(ggplot2)
 ```
 
-<img src="../man/figures/logo.jpg" align="right" height="120" alt="DSIR logo" />
+<img src="../man/figures/logo.png" align="right" width="120" height="120" alt="DSIR logo" />
 
 DSIR is a small R package for global health data work. It consists of 
 WHO Member State metadata, lightweight clients for the GHO and UN SDG 
@@ -136,6 +138,65 @@ are requested from the server.
 ```{r, eval = run_live}
 gho_coverage("WHOSIS_000001", area = c("FRA", "DEU", "JPN"))
 ```
+
+## Querying source update timestamps
+
+The experimental `gho_last_updated()` asks for the latest non-missing
+timestamp among one indicator's current observations across all locations,
+years and dimensions.
+It follows the existing backend rules: an explicit argument overrides
+`DSIR.who_backend`, and the default is `"auto"` when neither is set. Auto prefers
+xMart and only tries legacy for a verified absent or completely empty indicator.
+Missing timestamps do not trigger fallback. The result records its actual backend.
+
+```{r, eval = FALSE}
+gho_last_updated("WHS4_100")
+gho_last_updated("WHS4_100", backend = "xmart")
+gho_last_updated("WHS4_100", backend = "xmart", diagnostics = TRUE)
+
+updates <- lapply(c("WHS4_100", "NCDMORT3070"), gho_last_updated,
+                  backend = "legacy")
+do.call(rbind, updates)
+```
+
+The source fields are `Date` for legacy and `Sys_CommitDateUtc` for xMart.
+DSIR has not established that legacy `Date` records an official modification
+or publication date; an xMart system commit can reflect processing. Neither
+field is the latest observation year. Each date request retrieves at most
+one row. xMart also uses cached directory and table-field lookups. Auto adds
+a small whole-indicator availability request before the date query; request
+failures and missing timestamps never trigger fallback.
+Sequential requests for every indicator can take considerable time.
+
+The default eight columns are unchanged. `diagnostics = TRUE` adds `reason`,
+`stage`, `http_status`, `timestamp_kind`, `provider_route` and
+`provider_indicator`, with no extra requests. `directory_not_listed` reports
+a code absent from a successfully read directory; it does not prove the GHO
+code invalid. `http_error` and `request_failed` identify HTTP and connection
+failures. `timestamp_field_missing` and `timestamp_missing` distinguish a
+missing field from a response with no non-missing timestamp. A successful
+directory request does not prove that observation requests work.
+`checked_at` is the check start, not data retrieval or source modification
+time. Shared system timestamps do not prove that indicator values changed
+together; use snapshots to compare retrieved values.
+
+The UN SDG API provides a database-level timestamp rather than an equivalent
+indicator-level field:
+
+```{r, eval = FALSE}
+sdg_last_updated()
+```
+
+Both helpers return one row with `source`, `backend`, `scope`, `indicator`,
+`updated`, `timestamp_field`, `checked_at` and `status`. `updated` retains the
+original string and its time-zone information; an unspecified source zone is
+not assumed to be UTC. `checked_at` is the query start time in UTC.
+`status` distinguishes `"ok"`, `"not_available"` (no timestamp provided) and
+`"failed"` (lookup, request or response validation failed). A missing timestamp
+does not prove that observations are absent. The SDG `scope` is `"database"`,
+with missing `backend` and `indicator`. Its timestamp does not mean that every
+series changed then; series release codes and metadata-document update dates
+are not substituted for data update timestamps.
 
 ## Fetching indicator data from GHO
 
@@ -306,7 +367,10 @@ globally — booktabs theme, bold headers, modest padding. Call it once
 near the top of your report and every subsequent `flextable()` picks 
 up the formatting.
 
-```{r, eval = run_live}
+`flextable` (>= 0.9.0) is a suggested package. Install it with
+`install.packages("flextable")` before running the table examples.
+
+```{r, eval = run_tables}
 library(flextable)
 dsi_flextable_defaults(font_family = "Geogria")
 

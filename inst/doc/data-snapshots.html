@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Auditable GHO data snapshots</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Auditable GHO data snapshots</h1>
+
+
+
+<p><code>data_snapshot()</code> records an extract that you already
+have. <code>compare_snapshots()</code> compares two such extracts
+without calling an API. The first snapshot schema supports one GHO
+indicator and one backend. It does not schedule queries, maintain a
+database or automatically rebuild reports. The existing
+<code>snapshot()</code> function remains an expression cache.</p>
+<p>The <a href="https://www.who.int/data/gho/info/gho-odata-api">WHO
+OData guide</a> describes dimension and time filters. These helpers
+retain the supplied extract rather than fetching another view of the
+source.</p>
+<div id="start-from-a-complete-query" class="section level2">
+<h2>Start from a complete query</h2>
+<p>Use raw <code>gho_data()</code> output so every returned dimension
+and metadata column is retained. Repeat the same query with the same
+backend later. These network examples are displayed without
+execution:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>old_data <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&quot;WHS4_100&quot;</span>, <span class="at">spatial_type =</span> <span class="st">&quot;country&quot;</span>, <span class="at">area =</span> <span class="st">&quot;PHL&quot;</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>                     <span class="at">year_from =</span> <span class="dv">2020</span>, <span class="at">backend =</span> <span class="st">&quot;xmart&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">data_snapshot</span>(old_data, <span class="at">file =</span> <span class="st">&quot;snapshots/gho_old.rds&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co"># Later, repeat exactly the same selection.</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&quot;WHS4_100&quot;</span>, <span class="at">spatial_type =</span> <span class="st">&quot;country&quot;</span>, <span class="at">area =</span> <span class="st">&quot;PHL&quot;</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>                     <span class="at">year_from =</span> <span class="dv">2020</span>, <span class="at">backend =</span> <span class="st">&quot;xmart&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">data_snapshot</span>(new_data, <span class="at">file =</span> <span class="st">&quot;snapshots/gho_new.rds&quot;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">compare_snapshots</span>(<span class="st">&quot;snapshots/gho_old.rds&quot;</span>, <span class="st">&quot;snapshots/gho_new.rds&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>result<span class="sc">$</span>summary</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>result<span class="sc">$</span>modified</span></code></pre></div>
+<p>The legacy backend is also supported; choose it explicitly in both
+queries. Explicit backends do not switch providers. A failed or
+incomplete retrieval cannot silently replace a good file. Existing paths
+cause an error unless <code>overwrite = TRUE</code> is explicitly
+requested.</p>
+<p>For cleaned data, use
+<code>gho_clean(data, keep_dimensions = TRUE, keep_metadata = TRUE)</code>.
+The default 15-column cleaned schema does not retain all identity
+information and is rejected. Fields discarded before snapshot creation
+cannot be recovered. In particular, the snapshot preserves the data
+returned by DSIR; it cannot add publication-state or release evidence
+absent from the supplied frame.</p>
+</div>
+<div id="a-reproducible-offline-comparison" class="section level2">
+<h2>A reproducible offline comparison</h2>
+<p>This synthetic example includes male and female observations for the
+same country and year. Matching only country and year would be
+ambiguous.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>old_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">IndicatorCode =</span> <span class="st">&quot;EXAMPLE&quot;</span>, <span class="at">SpatialDimType =</span> <span class="st">&quot;COUNTRY&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">SpatialDim =</span> <span class="st">&quot;PHL&quot;</span>, <span class="at">TimeDimType =</span> <span class="st">&quot;YEAR&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">TimeDim =</span> <span class="fu">c</span>(<span class="dv">2020</span><span class="dt">L</span>, <span class="dv">2020</span><span class="dt">L</span>, <span class="dv">2021</span><span class="dt">L</span>, <span class="dv">2021</span><span class="dt">L</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">Dim1Type =</span> <span class="st">&quot;SEX&quot;</span>, <span class="at">Dim1 =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;SEX_MLE&quot;</span>, <span class="st">&quot;SEX_FMLE&quot;</span>), <span class="dv">2</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="at">Dim2Type =</span> <span class="st">&quot;AGEGROUP&quot;</span>, <span class="at">Dim2 =</span> <span class="st">&quot;AGEGROUP_YEARS15-49&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">Dim3Type =</span> <span class="cn">NA_character_</span>, <span class="at">Dim3 =</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">NumericValue =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">20</span>, <span class="dv">22</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">Comments =</span> <span class="cn">NA_character_</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>scope <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">spatial_type =</span> <span class="st">&quot;country&quot;</span>, <span class="at">area =</span> <span class="st">&quot;PHL&quot;</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>              <span class="at">year_from =</span> <span class="dv">2020</span>, <span class="at">year_to =</span> <span class="cn">NULL</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>old_path <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.rds&quot;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>new_path <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.rds&quot;</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="fu">data_snapshot</span>(old_data, old_path, <span class="at">backend =</span> <span class="st">&quot;legacy&quot;</span>, <span class="at">scope =</span> scope)</span></code></pre></div>
+<p>An imported frame has no recorded request, so this example declares
+its complete scope. <code>year_to = NULL</code> means the query has no
+upper year limit; an additional year can therefore be an addition under
+the same selection.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Keep three old observations; omit the female observation from 2021.</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> old_data[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, ]</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>new_data<span class="sc">$</span>NumericValue[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>new_data<span class="sc">$</span>Comments[<span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="st">&quot;Updated explanatory note&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co"># Add an observation in a later year.</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>new_row <span class="ot">&lt;-</span> old_data[<span class="dv">1</span>, ]</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>new_row<span class="sc">$</span>TimeDim <span class="ot">&lt;-</span> <span class="dv">2022</span><span class="dt">L</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>new_row<span class="sc">$</span>NumericValue <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(new_data, new_row)</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="fu">data_snapshot</span>(new_data, new_path, <span class="at">backend =</span> <span class="st">&quot;legacy&quot;</span>, <span class="at">scope =</span> scope)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">compare_snapshots</span>(old_path, new_path)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>result<span class="sc">$</span>summary[, <span class="fu">c</span>(<span class="st">&quot;n_old&quot;</span>, <span class="st">&quot;n_new&quot;</span>, <span class="st">&quot;n_added&quot;</span>, <span class="st">&quot;n_removed&quot;</span>, <span class="st">&quot;n_modified&quot;</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>                  <span class="st">&quot;n_unchanged&quot;</span>, <span class="st">&quot;n_value_modified&quot;</span>, <span class="st">&quot;n_metadata_only&quot;</span>)]</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 8</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt;   n_old n_new n_added n_removed n_modified n_unchanged n_value_modified</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;int&gt;   &lt;int&gt;     &lt;int&gt;      &lt;int&gt;       &lt;int&gt;            &lt;int&gt;</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; 1     4     4       1         1          2           1                1</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; # ℹ 1 more variable: n_metadata_only &lt;int&gt;</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>result<span class="sc">$</span>modified[, <span class="fu">c</span>(<span class="st">&quot;TimeDim&quot;</span>, <span class="st">&quot;Dim1&quot;</span>, <span class="st">&quot;old_value&quot;</span>, <span class="st">&quot;new_value&quot;</span>,</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>                   <span class="st">&quot;absolute_change&quot;</span>, <span class="st">&quot;relative_change&quot;</span>, <span class="st">&quot;change_type&quot;</span>)]</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 × 7</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt;   TimeDim Dim1   old_value new_value absolute_change relative_change change_type</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt;     &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;     &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;      </span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; 1    2020 SEX_M…        10        11               1             0.1 value      </span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; 2    2021 SEX_M…        20        20               0             0   metadata_o…</span></span></code></pre></div>
+<p>The result has one added observation, one removed observation, one
+value modification, one metadata-only modification, and one unchanged
+observation. The historical value changes from 10 to 11, an absolute
+change of +1 and a relative change of 0.1 (10%). The primary value
+remains 20 for the note-only modification.
+<code>modified$changed_fields</code> names the fields that changed;
+<code>modified$old</code> and <code>modified$new</code> are data-frame
+columns retaining the complete old/new tables in the same order as the
+modified observations. For example, <code>modified$old[1, ]</code>
+retrieves the first corresponding old row. <code>added</code>,
+<code>removed</code> and <code>unchanged</code> also contain complete
+observations.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>saved <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(old_path)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>saved<span class="sc">$</span>schema_version</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>saved<span class="sc">$</span>key</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;IndicatorCode&quot;  &quot;SpatialDimType&quot; &quot;SpatialDim&quot;     &quot;TimeDimType&quot;   </span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt;  [5] &quot;TimeDim&quot;        &quot;Dim1Type&quot;       &quot;Dim1&quot;           &quot;Dim2Type&quot;      </span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;Dim2&quot;           &quot;Dim3Type&quot;       &quot;Dim3&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="fu">identical</span>(saved<span class="sc">$</span>data, old_data)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+</div>
+<div id="identity-and-compatibility" class="section level2">
+<h2>Identity and compatibility</h2>
+<p>Default matching includes the indicator, geographical type/code,
+temporal type/value, positional dimension type/code pairs, all available
+named dimensions, detailed temporal coordinates, unit and measure
+family. Legacy data-source dimensions also participate. Record IDs and
+provider-reported timestamps are metadata. Duplicate keys or a populated
+dimension code without its type cause an error. Add a genuinely
+additional semantic dimension through <code>key</code>; do not add a row
+number or record ID merely to hide duplicates.</p>
+<p>The two snapshots must have the same source, backend, indicator,
+layout, origin, complete query scope and identity specification. Unit
+and measure-family context must also agree. A PHL-only query cannot be
+compared with a WPR query as though the additional countries were source
+revisions. Raw and cleaned representations must not be mixed.</p>
+<p>Recorded scope comes from the existing <code>who_provenance</code>
+request information. After filtering locally, pass a named
+<code>scope</code> covering <strong>all</strong> filters. The helper
+rejects stale row counts when scope is inferred, but cannot detect local
+edits that leave row count unchanged. A declared scope is the caller’s
+auditable assertion; the helper cannot verify what a manually imported
+or edited frame originally represented. Scope strings are compared
+conservatively: equivalent requests with differently written filter
+expressions may be rejected. Equal keys and scope do not independently
+establish scientific equivalence.</p>
+</div>
+<div id="values-metadata-and-precision" class="section level2">
+<h2>Values, metadata and precision</h2>
+<p>By default, numeric value, uncertainty bounds and the original
+display value are value fields. All other non-key columns are metadata
+fields. A changed label, note, service ID or provider timestamp can
+therefore produce a metadata-only modification. Snapshot and retrieval
+times do not.</p>
+<p>NA matches NA; NA versus a known value is a change. Integer/double
+numeric representation and JSON’s null-only logical columns are handled
+without false changes. Missing optional metadata is treated as missing,
+with column additions, removals and type changes also reported in
+<code>schema_changes</code>. List-note order is preserved. Unsupported
+non-missing type conversions stop comparison instead of guessing.</p>
+<p>The default numerical tolerance is zero. To compare only numeric
+values with a chosen absolute tolerance:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">compare_snapshots</span>(old_path, new_path, <span class="at">fields =</span> <span class="st">&quot;NumericValue&quot;</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                  <span class="at">tolerance =</span> <span class="fl">1e-8</span>)<span class="sc">$</span>summary<span class="sc">$</span>n_modified</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<p>Selecting <code>fields</code> restricts which changes count; this
+example deliberately ignores the note change. Character display strings
+are exact even when numeric values are within tolerance. Absolute change
+means signed <code>new - old</code>. Relative change is
+<code>(new - old) / old</code>, and is NA for zero/missing old values or
+non-finite calculations.</p>
+</div>
+<div id="four-different-times-and-decisions-about-reports" class="section level2">
+<h2>Four different times and decisions about reports</h2>
+<ul>
+<li><strong>Source modification time:</strong> retain a
+provider-reported field if available. Its semantics may be uncertain.
+Legacy <code>Date</code> and xMart system commit dates do not by
+themselves prove an official observation revision or publication.</li>
+<li><strong>Retrieval time:</strong> when DSIR fetched the extract, if
+recorded in provenance. Creating a snapshot from an older in-memory
+frame does not change that time.</li>
+<li><strong>Snapshot creation time:</strong> when the RDS wrapper was
+created, explicitly UTC.</li>
+<li><strong>Latest observation year:</strong> the latest period
+represented in the data. It is not a timestamp for retrieval, creation
+or revision.</li>
+</ul>
+<p>Saved extracts demonstrate differences observed in those extracts.
+They cannot establish the exact date or reason for a source revision. To
+review an existing report, inspect additions, removals and value
+modifications within the countries, periods and dimensions that the
+report actually used. Also review metadata-only changes if notes, labels
+or annotations appear in outputs. The helpers do not track a report’s
+dependencies and make no automatic decision to regenerate it.</p>
+<p>Snapshots are plain local RDS files, not a cryptographic audit trail.
+No hash is based on serialized bytes: reordering rows does not create a
+change. No credentials or environment settings are collected. Check your
+own free-text data for sensitive information before saving or sharing a
+file.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

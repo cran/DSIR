@@ -1,6 +1,6 @@
-test_that('legacy is the compatibility default and configuration is validated', {
+test_that('auto is the default and configuration is validated', {
   withr::local_options(DSIR.who_backend = NULL, DSIR.who_base_url = NULL)
-  expect_equal(.who_config()$backend, 'legacy')
+  expect_equal(.who_config()$backend, 'auto')
   expect_equal(.who_config()$base, 'https://xmart-api-public.who.int')
   withr::local_options(DSIR.who_backend = 'other')
   expect_error(.who_config(), 'backend')
@@ -141,7 +141,7 @@ test_that('GHO unknown codes never trigger legacy fallback', {
   withr::local_options(DSIR.who_backend = 'xmart')
   testthat::local_mocked_bindings(.xmart_catalog = function() tibble::tibble(IND_CODE_GHO = 'known'),
     .legacy_gho_data = function(...) stop('legacy called'), .package = 'DSIR')
-  expect_warning(out <- gho_data('unknown'), 'Unknown GHO')
+  expect_warning(out <- gho_data('unknown'), 'not listed in the public xMart directory')
   expect_equal(nrow(out), 0L)
 })
 

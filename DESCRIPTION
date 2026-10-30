@@ -1,6 +1,6 @@
 Package: DSIR
 Title: Data Science Infrastructure for Global Health
-Version: 0.11.0
+Version: 0.13.0
 Authors@R: person(given = "Shanlong",
                   family = "Ding",
                   role = c("aut", "cre"),
@@ -16,7 +16,8 @@ Description: Supports global health data analysis, including a
     construction, a snapshot helper for reproducible data pulls, and
     convenience clients for the World Health Organization Global Health
     Observatory (GHO) through its legacy OData API
-    <https://ghoapi.azureedge.net/api/> or the public WHO xMart OData API
+    <https://www.who.int/data/gho/info/gho-odata-api>
+    or the public WHO xMart OData API
     <https://xmart-api-public.who.int/DATA_>, Global Health Estimates (GHE)
     through WHO xMart, and
     the United Nations Sustainable Development Goals (SDG) API
@@ -28,18 +29,18 @@ URL: https://github.com/shanlong-who/DSIR,
 BugReports: https://github.com/shanlong-who/DSIR/issues
 Encoding: UTF-8
 Depends: R (>= 4.1.0)
-Imports: cli, flextable (>= 0.9.0), ggplot2 (>= 3.4.0), httr2 (>=
-        1.0.0), rlang, tibble (>= 3.0.0), vctrs
-Suggests: patchwork, officer, testthat (>= 3.0.0), httptest2, knitr,
-        rmarkdown, dplyr (>= 1.1.0), withr
+Imports: cli, ggplot2 (>= 3.4.0), httr2 (>= 1.0.0), rlang, tibble (>=
+        3.0.0), vctrs
+Suggests: flextable (>= 0.9.0), patchwork, officer, testthat (>=
+        3.0.0), httptest2, knitr, rmarkdown, dplyr (>= 1.1.0), withr
 Config/testthat/edition: 3
 LazyData: true
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-10-12 02:19:26 UTC; dings
+Packaged: 2026-10-30 11:38:26 UTC; runner
 Author: Shanlong Ding [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-9048-6670>)
 Maintainer: Shanlong Ding <dings@who.int>
 Repository: CRAN
-Date/Publication: 2026-10-12 07:40:02 UTC
+Date/Publication: 2026-10-30 12:50:02 UTC
