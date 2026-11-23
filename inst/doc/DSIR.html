@@ -548,21 +548,25 @@ region can be pulled in one call.</p>
 <p>Pick an <code>IndicatorCode</code> from the result — this is the
 value you pass to <code>gho_data()</code> in the next step.</p>
 </div>
-<div id="step-2-fetch-the-data" class="section level3">
-<h3>Step 2: Fetch the data</h3>
+<div id="step-2-fetch-raw-observations" class="section level3">
+<h3>Step 2: Fetch raw observations</h3>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>uhc <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(</span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="at">indicator    =</span> <span class="st">&quot;UHC_INDEX_REPORTED&quot;</span>,</span>
 <span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="at">spatial_type =</span> <span class="st">&quot;country&quot;</span>,</span>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="at">area         =</span> wpro_cty,</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="at">year_from    =</span> <span class="dv">2015</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>)</span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a></span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>uhc <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code></pre></div>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="at">year_from    =</span> <span class="dv">2015</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="at">clean =</span> <span class="cn">FALSE</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>)</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>uhc <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code></pre></div>
 <p>Note that <code>area</code> accepts long ISO3 vectors — here we fetch
 all 28 WPR countries in one call.</p>
 </div>
-<div id="step-3-clean-the-raw-response" class="section level3">
-<h3>Step 3: Clean the raw response</h3>
+<div id="step-3-inspect-the-cleaned-response" class="section level3">
+<h3>Step 3: Inspect the cleaned response</h3>
+<p>The two-step example uses <code>clean = FALSE</code> to show the raw
+columns. With the default <code>clean = TRUE</code>,
+<code>gho_data()</code> performs this cleaning step directly.</p>
 <p><code>gho_clean()</code> produces the <strong>unified DSIR
 cleaned-indicator schema</strong> — the same 15-column shape as
 <code>sdg_clean()</code>. Columns include <code>source</code>
@@ -711,9 +715,9 @@ table examples.</p>
 </div>
 <div id="working-with-sdg-indicators" class="section level2">
 <h2>Working with SDG indicators</h2>
-<p><code>sdg_data()</code> and <code>sdg_clean()</code> follow the same
-fetch-then-tidy pattern as their GHO counterparts. The main differences
-are that indicator codes use the dotted SDG format
+<p><code>sdg_data(clean = FALSE)</code> and <code>sdg_clean()</code>
+support the same two-step pattern as their GHO counterparts. The main
+differences are that indicator codes use the dotted SDG format
 (e.g. <code>&quot;3.4.1&quot;</code>) and that raw <code>value</code> is kept as
 character — the SDG API returns non-numeric entries
 (<code>&quot;&lt;0.1&quot;</code>, aggregate notes) for some rows. The cleaned
@@ -739,12 +743,13 @@ mix the two formats in a single call.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># ISO3 — regional vector passed straight through</span></span>
 <span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>sdg <span class="ot">&lt;-</span> <span class="fu">sdg_data</span>(</span>
 <span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>  <span class="at">indicator =</span> <span class="st">&quot;3.4.1&quot;</span>,</span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>  <span class="at">area      =</span> wpro_cty</span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>)</span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>sdg <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co"># M49 also works (e.g. when copy-pasting codes from sdg_areas())</span></span>
-<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="fu">sdg_data</span>(<span class="st">&quot;3.4.1&quot;</span>, <span class="at">area =</span> <span class="fu">c</span>(<span class="st">&quot;608&quot;</span>, <span class="st">&quot;250&quot;</span>))</span></code></pre></div>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>  <span class="at">area      =</span> wpro_cty,</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>  <span class="at">clean =</span> <span class="cn">FALSE</span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>)</span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a>sdg <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="co"># M49 also works (e.g. when copy-pasting codes from sdg_areas())</span></span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="fu">sdg_data</span>(<span class="st">&quot;3.4.1&quot;</span>, <span class="at">area =</span> <span class="fu">c</span>(<span class="st">&quot;608&quot;</span>, <span class="st">&quot;250&quot;</span>))</span></code></pre></div>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">sdg_clean</span>(sdg)</span></code></pre></div>
 <p>By default, <code>sdg_clean()</code> produces the same 15-column
 schema as <code>gho_clean()</code>, so the two outputs can be combined
@@ -758,7 +763,7 @@ GHO-only <code>dim1</code>–<code>dim3</code> columns as
 <p>SDG dimensions are named fields in <code>sdg$dimensions</code>, not
 positional GHO dimensions. The compact 15-column output omits them. For
 disaggregated analysis, retain them explicitly:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">sdg_data</span>(<span class="st">&quot;3.8.2&quot;</span>, <span class="at">area =</span> <span class="st">&quot;PHL&quot;</span>)</span>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">sdg_data</span>(<span class="st">&quot;3.8.2&quot;</span>, <span class="at">area =</span> <span class="st">&quot;PHL&quot;</span>, <span class="at">clean =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">unique</span>(raw<span class="sc">$</span>dimensions)</span>
 <span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="fu">sdg_clean</span>(raw, <span class="at">keep_dimensions =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>This appends character columns such as <code>dim_age</code>,
@@ -776,9 +781,9 @@ attributes in the cleaned table.</p>
 <span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>  <span class="at">dimensions =</span> <span class="fu">list</span>(</span>
 <span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>    <span class="at">Age =</span> <span class="st">&quot;ALLAGE&quot;</span>, <span class="at">Location =</span> <span class="st">&quot;ALLAREA&quot;</span>, <span class="at">Sex =</span> <span class="st">&quot;BOTHSEX&quot;</span>,</span>
 <span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>    <span class="at">Quantile =</span> <span class="st">&quot;_T&quot;</span>, <span class="at">Type_of_household =</span> <span class="st">&quot;_T&quot;</span></span>
-<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>  )</span>
-<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a>  <span class="fu">sdg_clean</span>(<span class="at">keep_dimensions =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>  ),</span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a>  <span class="at">keep_dimensions =</span> <span class="cn">TRUE</span></span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a>)</span></code></pre></div>
 <p>These filters run locally after pagination. Values within one
 dimension are OR-ed; different dimensions are AND-ed. An absent
 requested dimension warns and returns no rows instead of silently
@@ -817,10 +822,9 @@ structure.</p>
 of 2026-10-06. Select the legacy provider explicitly for this
 example.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>gho_detailed <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&quot;FINANCIALHARDSHIP_PROPORTIONOFPOP&quot;</span>, <span class="at">area =</span> <span class="st">&quot;PHL&quot;</span>,</span>
-<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>                         <span class="at">backend =</span> <span class="st">&quot;legacy&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>  <span class="fu">gho_clean</span>(<span class="at">keep_dimensions =</span> <span class="cn">TRUE</span>, <span class="at">keep_metadata =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>gho_detailed <span class="sc">|&gt;</span></span>
-<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>  <span class="fu">select</span>(provider, iso3, year, value_num, dim1_type, dim1, dim2_type, dim2)</span></code></pre></div>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>                         <span class="at">backend =</span> <span class="st">&quot;legacy&quot;</span>, <span class="at">keep_dimensions =</span> <span class="cn">TRUE</span>, <span class="at">keep_metadata =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>gho_detailed <span class="sc">|&gt;</span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>  <span class="fu">select</span>(provider, iso3, year, value_num, dim1_type, dim1, dim2_type, dim2)</span></code></pre></div>
 <p>Types are taken from each observation’s
 <code>Dim1Type</code>–<code>Dim3Type</code>. They are never guessed from
 a code prefix or assumed constant for the whole indicator. GHO metadata
@@ -849,8 +853,8 @@ does not harmonise codes or definitions across the sources.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># Two indicators on the same topic from different APIs:</span></span>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#   GHO NCDMORT3070 (probability of premature NCD mortality)</span></span>
 <span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="co">#   SDG 3.4.1       (mortality rate from NCDs)</span></span>
-<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>gho_ncd <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&quot;NCDMORT3070&quot;</span>, <span class="at">area =</span> wpro_cty) <span class="sc">|&gt;</span> <span class="fu">gho_clean</span>()</span>
-<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a>sdg_ncd <span class="ot">&lt;-</span> <span class="fu">sdg_data</span>(<span class="st">&quot;3.4.1&quot;</span>,        <span class="at">area =</span> wpro_cty) <span class="sc">|&gt;</span> <span class="fu">sdg_clean</span>()</span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>gho_ncd <span class="ot">&lt;-</span> <span class="fu">gho_data</span>(<span class="st">&quot;NCDMORT3070&quot;</span>, <span class="at">area =</span> wpro_cty)</span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a>sdg_ncd <span class="ot">&lt;-</span> <span class="fu">sdg_data</span>(<span class="st">&quot;3.4.1&quot;</span>,        <span class="at">area =</span> wpro_cty)</span>
 <span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="fu">bind_indicators</span>(gho_ncd, sdg_ncd) <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code></pre></div>
 </div>
 <div id="exploring-series-with-sdg_coverage" class="section level3">

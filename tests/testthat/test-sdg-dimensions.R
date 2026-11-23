@@ -32,7 +32,7 @@ test_that("SDG named dimensions remain aligned after cleaning and sorting", {
   out <- sdg_clean(raw, keep_dimensions = TRUE)
 
   expect_equal(ncol(compact), 15L)
-  expect_identical(out[names(compact)], compact)
+  expect_identical(tibble::as_tibble(out)[names(compact)], tibble::as_tibble(compact))
   expect_named(out, c(
     names(compact), "dim_age", "dim_location", "dim_sex",
     "dim_reporting_type", "dim_quantile", "dim_type_of_household"
@@ -56,7 +56,8 @@ test_that("cleaning handles missing and list-form SDG dimension records", {
   expect_identical(out$dim_age, rep(NA_character_, 3))
 
   raw$dimensions <- NULL
-  expect_identical(sdg_clean(raw, keep_dimensions = TRUE), sdg_clean(raw))
+  expect_identical(tibble::as_tibble(sdg_clean(raw, keep_dimensions = TRUE)),
+                   tibble::as_tibble(sdg_clean(raw)))
 })
 
 test_that("zero-row SDG subsets retain known dimension names and types", {
@@ -66,8 +67,8 @@ test_that("zero-row SDG subsets retain known dimension names and types", {
   expect_equal(ncol(out), 21L)
   expect_type(out$dim_age, "character")
   expect_type(out$year, "integer")
-  expect_identical(sdg_clean(tibble::tibble(), keep_dimensions = TRUE),
-                   sdg_clean(tibble::tibble()))
+  expect_identical(tibble::as_tibble(sdg_clean(tibble::tibble(), keep_dimensions = TRUE)),
+                   tibble::as_tibble(sdg_clean(tibble::tibble())))
 })
 
 test_that("invalid dimension retention options and ambiguous names fail clearly", {
@@ -127,7 +128,7 @@ test_that("series and dimension filters run after all pages are downloaded", {
   out <- httr2::with_mocked_responses(mock, {
     sdg_data("3.8.2", area = "PHL", year_from = 2010,
              series = "TARGET",
-             dimensions = list(Sex = c("BOTHSEX", "FEMALE"), Quantile = "_T"))
+             dimensions = list(Sex = c("BOTHSEX", "FEMALE"), Quantile = "_T"), clean = FALSE)
   })
   expect_length(urls, 2L)
   expect_false(any(grepl("Sex|Quantile|TARGET|timePeriodStart", urls)))
@@ -143,12 +144,12 @@ test_that("missing requested dimensions never return unfiltered observations", {
     '"dimensions":{"Sex":"BOTHSEX"}}],"totalPages":1}'
   ))
   httr2::with_mocked_responses(list(page), {
-    expect_warning(out <- sdg_data("3.8.2", dimensions = list(Quantile = "_T")),
+    expect_warning(out <- sdg_data("3.8.2", dimensions = list(Quantile = "_T"), clean = FALSE),
                    "not present")
     expect_equal(nrow(out), 0L)
   })
   httr2::with_mocked_responses(list(page), {
-    out <- sdg_data("3.8.2", dimensions = list(Sex = "FEMALE"))
+    out <- sdg_data("3.8.2", dimensions = list(Sex = "FEMALE"), clean = FALSE)
     expect_equal(nrow(out), 0L)
     expect_type(sdg_clean(out, keep_dimensions = TRUE)$dim_sex, "character")
   })
@@ -170,9 +171,9 @@ test_that("invalid filters fail before any network request", {
   for (bad in list("BOTHSEX", list("BOTHSEX"), list(Sex = character()),
                    list(Sex = NA_character_), list(Sex = ""),
                    list(Sex = "MALE", Sex = "FEMALE"))) {
-    expect_error(sdg_data("3.8.2", dimensions = bad), "named list")
+    expect_error(sdg_data("3.8.2", dimensions = bad, clean = FALSE), "named list")
   }
   for (bad in list(1, character(), NA_character_, "")) {
-    expect_error(sdg_data("3.8.2", series = bad), "character vector")
+    expect_error(sdg_data("3.8.2", series = bad, clean = FALSE), "character vector")
   }
 })

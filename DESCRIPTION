@@ -1,6 +1,6 @@
 Package: DSIR
 Title: Data Science Infrastructure for Global Health
-Version: 0.13.0
+Version: 0.15.0
 Authors@R: person(given = "Shanlong",
                   family = "Ding",
                   role = c("aut", "cre"),
@@ -31,16 +31,17 @@ Encoding: UTF-8
 Depends: R (>= 4.1.0)
 Imports: cli, ggplot2 (>= 3.4.0), httr2 (>= 1.0.0), rlang, tibble (>=
         3.0.0), vctrs
-Suggests: flextable (>= 0.9.0), patchwork, officer, testthat (>=
-        3.0.0), httptest2, knitr, rmarkdown, dplyr (>= 1.1.0), withr
+Suggests: sf (>= 1.0.0), flextable (>= 0.9.0), patchwork, officer,
+        testthat (>= 3.0.0), httptest2, knitr, rmarkdown, dplyr (>=
+        1.1.0), withr
 Config/testthat/edition: 3
 LazyData: true
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-10-30 11:38:26 UTC; runner
+Packaged: 2026-11-23 06:00:34 UTC; User
 Author: Shanlong Ding [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-9048-6670>)
 Maintainer: Shanlong Ding <dings@who.int>
 Repository: CRAN
-Date/Publication: 2026-10-30 12:50:02 UTC
+Date/Publication: 2026-11-23 12:20:02 UTC

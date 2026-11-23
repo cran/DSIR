@@ -14,7 +14,10 @@ gho_data(
   dim2 = NULL,
   dim3 = NULL,
   dimensions = NULL,
-  backend = NULL
+  backend = NULL,
+  clean = TRUE,
+  keep_dimensions = FALSE,
+  keep_metadata = FALSE
 )
 }
 \arguments{
@@ -56,13 +59,41 @@ selection never translates these filters to legacy.}
 uses the \code{DSIR.who_backend} option, or \code{"auto"} when that option is
 unset. An explicit argument overrides the option for this call without
 changing it. Use the same backend for discovery and retrieval.}
+
+\item{clean}{Logical. Return cleaned observations as a \code{dsir_data} tibble
+by default. Use \code{FALSE} for the original observation columns.}
+
+\item{keep_dimensions}{Logical. Append \code{dim1_type}, \code{dim2_type}, and
+\code{dim3_type} from the source's \code{Dim1Type}, \code{Dim2Type}, and \code{Dim3Type}?
+Default \code{FALSE}. Types are kept per row: one indicator can use the
+same position for different dimensions. No type is guessed from a
+code's spelling, and missing types remain \code{NA}. xMart output also
+retains all named source dimensions as \verb{dim_*} character columns.}
+
+\item{keep_metadata}{Logical. Retain source context? Default \code{FALSE}.
+With \code{TRUE}, appends \code{provider} (\code{"legacy"} or \code{"xmart"}) from recorded
+retrieval provenance; unknown origins remain \code{NA}, never the current
+session setting. Also appends character columns \code{observation_id}, \code{spatial_type},
+\code{time_type}, \code{data_source_type}, \code{data_source}, \code{updated},
+\code{parent_location}, \code{parent_location_name}, \code{time_detail}, \code{time_start},
+and \code{time_end}, copied from the raw API fields. Raw \code{Comments} are kept
+as \code{footnotes}, a list-column of character vectors. Missing scalar
+fields are \code{NA}; missing list fields are empty character vectors.
+This option is independent of \code{keep_dimensions}. Unit and dimension
+labels are not inferred. xMart output also retains \code{unit},
+\code{measure_field}, and \code{spatial_type_source}. Both backends preserve
+acquisition provenance in the object metadata, including with the default
+15-column output. Plain tibble output also keeps \code{who_provenance}.
+Retaining these fields makes no extra
+network requests beyond the usual indicator-name lookup.}
 }
 \value{
-A \link[tibble:tibble]{tibble} of indicator observations, or
-an empty tibble when the service is unreachable or no observations match.
+A cleaned \link[=as_dsir_data]{dsir_data} table, or the raw observation
+tibble with \code{clean = FALSE}. Empty cleaned results have the same core schema.
 The raw \code{Provider} column records \code{"legacy"} or \code{"xmart"} per row.
-A \code{who_provenance} attribute records the selected backend and, for
-successful downloads, the request context and retrieval time.
+Raw output stores the selected backend in \code{who_provenance}. For cleaned
+output, use \code{dsir_metadata(x)$provenance$retrieval}. Successful downloads
+also record the request context and retrieval time.
 Automatic queries also record \code{requested_backend = "auto"} and, when
 fallback is attempted, \code{fallback_reason} (\code{"directory_not_listed"} or
 \code{"indicator_empty"}). The same selection metadata is attached to automatic
@@ -107,6 +138,53 @@ failures warn, and do not establish that no data exist.
 Reference lookups are cached only in memory; no credentials
 or startup requests are required.
 }
+\section{Retrieval metadata}{
+
+Raw downloads and directories carry acquisition records. GHO and SDG
+observation downloads also carry cleaning records unless \code{clean = FALSE}.
+\code{dsir_metadata(x)$sources} records the actual backend, endpoint, UTC
+\code{retrieved_at}, retrieval status, cache use, source record count, reported
+API version and release. Unknown versions and times remain \code{NA}.
+Each source row includes its own server query. \code{query} records the public
+selection, including local filters and reference-country/year restrictions.
+\code{result} describes the function's original return; \code{current} is computed
+from the supplied object. Source counts precede local filtering and GHE
+measure pivoting, so they can differ from returned row counts.
+
+Result status distinguishes \code{success}, \code{empty}, \code{failed}, \code{incomplete},
+\code{invalid}, \code{partial} and \code{unverified}. Completeness concerns the requested
+retrieval, not global indicator coverage. It is \code{NA} when the response
+lacks sufficient completeness information. A successful HTTP response
+alone does not establish completeness of an observation download.
+
+Cached records retain their original retrieval time and set \code{cache_hit}.
+A historical fallback uses \code{retrieval_status = "bundled_snapshot"} and
+retains the original collection date. It does not prove live availability.
+Failed SDG list requests still return \code{NULL} with a warning; \code{NULL} cannot
+carry metadata. Other empty failure results record no successful retrieval
+time. Existing WHO \code{who_provenance} and \code{catalog_snapshot} attributes remain
+available for compatibility.
+
+Cleaners preserve acquisition metadata even for empty input. This is
+independent of \code{keep_metadata}, which controls optional data columns.
+\code{as_dsir_data()} also retains \code{sources}, \code{query} and \code{result}. These are
+historical acquisition records, not an audit of arbitrary changes to a
+plain tibble. Use the S3 object's processing status to track supported
+transformations. \code{saveRDS()} preserves attributes; CSV does not.
+
+Cleaning records live in \code{cleaning}, also for \code{output = "tibble"} and
+user-supplied input without acquisition records. They contain the cleaner,
+package version, UTC cleaning time, input/output sizes and columns, options,
+and a profile of semantic fields. Each profile records its retained column
+(or \code{NA}), distinct count including missing values, missing count and its
+constant value, if any. From 0.15.0, \code{cleaning$dimension_values} stores
+the distinct observed codes for each named dimension at cleaning time.
+Per-row membership is available only for retained dimensions.
+Recorded aliases link equivalent core and named dimensions. Cleaning time
+never substitutes for retrieval time. These records describe the cleaning
+input; current coverage and subsequent field status remain separate.
+}
+
 \examples{
 \donttest{
 # Country-level data for one indicator

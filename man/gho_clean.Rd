@@ -4,10 +4,17 @@
 \alias{gho_clean}
 \title{Tidy a GHO Data Frame}
 \usage{
-gho_clean(df, keep_dimensions = FALSE, keep_metadata = FALSE)
+gho_clean(
+  df,
+  keep_dimensions = FALSE,
+  keep_metadata = FALSE,
+  output = c("dsir_data", "tibble")
+)
 }
 \arguments{
-\item{df}{A data frame returned by \code{\link[=gho_data]{gho_data()}}.}
+\item{df}{Raw observations from \code{\link[=gho_data]{gho_data()}} with \code{clean = FALSE}, or an
+already cleaned GHO table. Repeated cleaning preserves retained fields.
+Request additional fields at download time or clean the raw observations.}
 
 \item{keep_dimensions}{Logical. Append \code{dim1_type}, \code{dim2_type}, and
 \code{dim3_type} from the source's \code{Dim1Type}, \code{Dim2Type}, and \code{Dim3Type}?
@@ -27,13 +34,19 @@ as \code{footnotes}, a list-column of character vectors. Missing scalar
 fields are \code{NA}; missing list fields are empty character vectors.
 This option is independent of \code{keep_dimensions}. Unit and dimension
 labels are not inferred. xMart output also retains \code{unit},
-\code{measure_field}, and \code{spatial_type_source}. Both backends preserve a
-\code{who_provenance} attribute, including with the default 15-column output.
+\code{measure_field}, and \code{spatial_type_source}. Both backends preserve
+acquisition provenance in the object metadata, including with the default
+15-column output. Plain tibble output also keeps \code{who_provenance}.
 Retaining these fields makes no extra
 network requests beyond the usual indicator-name lookup.}
+
+\item{output}{Return a \code{"dsir_data"} tibble subclass (default) or a plain
+\code{"tibble"}. Both carry acquisition and cleaning metadata as attributes;
+inspect them with \code{\link[=dsir_metadata]{dsir_metadata()}}. This does not add table columns.}
 }
 \value{
-A \link[tibble:tibble]{tibble} with 15 core columns: \code{source} (always
+A \link[=as_dsir_data]{dsir_data} tibble, or a plain tibble when requested,
+with 15 core columns: \code{source} (always
 \code{"gho"}), \code{id}, \code{indicator}, \code{location}, \code{iso3}, \code{location_name},
 \code{year}, \code{value}, \code{value_num}, \code{low}, \code{high}, \code{series} (\code{NA}),
 \code{dim1}, \code{dim2}, \code{dim3}. Sorted by \code{location} then \code{year}.
@@ -87,6 +100,53 @@ human-readable indicator name. If the catalog cannot be fetched
 bundled snapshot without caching it as live data. Codes absent from that
 snapshot, or unavailable xMart labels, remain \code{NA}.
 }
+\section{Retrieval metadata}{
+
+Raw downloads and directories carry acquisition records. GHO and SDG
+observation downloads also carry cleaning records unless \code{clean = FALSE}.
+\code{dsir_metadata(x)$sources} records the actual backend, endpoint, UTC
+\code{retrieved_at}, retrieval status, cache use, source record count, reported
+API version and release. Unknown versions and times remain \code{NA}.
+Each source row includes its own server query. \code{query} records the public
+selection, including local filters and reference-country/year restrictions.
+\code{result} describes the function's original return; \code{current} is computed
+from the supplied object. Source counts precede local filtering and GHE
+measure pivoting, so they can differ from returned row counts.
+
+Result status distinguishes \code{success}, \code{empty}, \code{failed}, \code{incomplete},
+\code{invalid}, \code{partial} and \code{unverified}. Completeness concerns the requested
+retrieval, not global indicator coverage. It is \code{NA} when the response
+lacks sufficient completeness information. A successful HTTP response
+alone does not establish completeness of an observation download.
+
+Cached records retain their original retrieval time and set \code{cache_hit}.
+A historical fallback uses \code{retrieval_status = "bundled_snapshot"} and
+retains the original collection date. It does not prove live availability.
+Failed SDG list requests still return \code{NULL} with a warning; \code{NULL} cannot
+carry metadata. Other empty failure results record no successful retrieval
+time. Existing WHO \code{who_provenance} and \code{catalog_snapshot} attributes remain
+available for compatibility.
+
+Cleaners preserve acquisition metadata even for empty input. This is
+independent of \code{keep_metadata}, which controls optional data columns.
+\code{as_dsir_data()} also retains \code{sources}, \code{query} and \code{result}. These are
+historical acquisition records, not an audit of arbitrary changes to a
+plain tibble. Use the S3 object's processing status to track supported
+transformations. \code{saveRDS()} preserves attributes; CSV does not.
+
+Cleaning records live in \code{cleaning}, also for \code{output = "tibble"} and
+user-supplied input without acquisition records. They contain the cleaner,
+package version, UTC cleaning time, input/output sizes and columns, options,
+and a profile of semantic fields. Each profile records its retained column
+(or \code{NA}), distinct count including missing values, missing count and its
+constant value, if any. From 0.15.0, \code{cleaning$dimension_values} stores
+the distinct observed codes for each named dimension at cleaning time.
+Per-row membership is available only for retained dimensions.
+Recorded aliases link equivalent core and named dimensions. Cleaning time
+never substitutes for retrieval time. These records describe the cleaning
+input; current coverage and subsequent field status remain separate.
+}
+
 \examples{
 \donttest{
 gho_data("NCDMORT3070", spatial_type = "country") |>

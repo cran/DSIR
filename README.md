@@ -24,19 +24,222 @@ Documentation: <https://shanlong-who.github.io/DSIR/>
 
 ## Installation
 
-Version **0.11.0** is available on [CRAN](https://CRAN.R-project.org/package=DSIR),
-published on **12 October 2026**.
+Version 0.15.0 is in preparation. Version 0.14.0 was released on GitHub.
 
 ```r
-# from CRAN
+# Current CRAN release
 install.packages("DSIR")
 
-# or the development version from GitHub
+# Current GitHub version
 # install.packages("remotes")
 remotes::install_github("shanlong-who/DSIR")
 ```
 
-## What's new in 0.13.0 (GitHub)
+## Experimental data objects and offline catalogs
+
+From 0.15.0, `gho_data()` and `sdg_data()` return a cleaned `dsir_data` tibble
+with 15 core columns by default. Set `clean = FALSE` for raw provider fields,
+including raw data for a source snapshot. GHO prefers xMart by default.
+Request `keep_dimensions = TRUE` for per-row breakdowns and `keep_metadata = TRUE`
+for observation attributes. Apply these options at download time.
+A repeated call to the same cleaner preserves an already cleaned result.
+GHE acquisition and discovery functions keep their previous interfaces.
+
+```r
+x <- sdg_data("3.2.1", area = "PHL", keep_dimensions = TRUE)
+print(x)
+summary(x)
+```
+
+Printing distinguishes current dimension codes from codes observed at cleaning
+when their columns were omitted. The summary shows the full code lists.
+
+Downloads and discovery results carry acquisition metadata by default:
+
+```r
+# Inspect an already retrieved table; these calls do not access the network.
+dsir_metadata(data.raw)$sources
+dsir_metadata(data.raw)$query
+dsir_metadata(data.raw)$result
+```
+
+This covers GHO, GHE and SDG downloads, their indicator/cause/dimension
+directories, and SDG goals, targets and areas. Source records keep the actual
+backend, endpoint, UTC retrieval time, cache use, original record count and
+reported versions. Cached and bundled records retain their original dates.
+The result status distinguishes valid emptiness from failure or incomplete
+retrieval. SDG list failures still return `NULL` with a warning.
+
+All three cleaners retain acquisition records and add a `cleaning` record,
+independently of optional metadata columns. Metadata lives in object attributes,
+not extra table columns. Counts in `sources` precede local filtering and GHE measure pivoting;
+`result` describes the original function return and `current` describes the
+supplied table. Acquisition metadata is historical and does not certify later
+edits to a plain tibble. Use `saveRDS()` to preserve it when saving data.
+
+```r
+library(DSIR)
+library(dplyr)
+
+# Use raw observations retrieved with clean = FALSE.
+data.clean <- gho_clean(data.raw, keep_dimensions = TRUE, keep_metadata = TRUE)
+summary(data.clean)
+dsir_metadata(data.clean)$provenance
+dsir_metadata(data.clean)$sources
+dsir_metadata(data.clean)$cleaning
+
+data.flagged <- data.clean %>% mutate(flag.high = value_num > 20)
+data.changed <- data.clean %>% mutate(value_num = value_num / 100)
+dsir_metadata(data.changed)$processing
+
+# Ordinary tibble output retains acquisition and cleaning attributes.
+data.table <- gho_clean(data.raw, output = "tibble")
+data.s3 <- as_dsir_data(data.table)
+```
+
+Both mutations retain `dsir_data` while its core structure is valid. Added
+columns are marked derived. Changing an input value flags its interpretation,
+including units and bounds, as needing review; no unit conversion is inferred.
+The metadata records field changes, not executable formulas. Summaries describe
+current coverage and missingness without pooling different measures. Joins,
+binding, persistent grouping and removal of required columns return ordinary
+tables. Use `.by` for transient grouping. `as_tibble()` explicitly removes the
+class and object metadata; `saveRDS()` preserves both. This interface is experimental.
+
+Cleaning time is distinct from retrieval time. The cleaning record describes
+the input and which dimensions/units were retained, including constant context
+omitted from table columns. Current coverage comes from the current rows.
+
+After selecting a single indicator, series, unit and comparable population
+stratum, use the experimental plot method:
+
+```r
+plot(data.clean, country = "PHL")
+plot(data.clean, year = 2023, interval = TRUE)
+
+# Keep the relevant named dimensions when cleaning.
+plot(data.clean, type = "trend", country = c("PHL", "LAO"),
+     group = "dim1", facet = "iso3")
+```
+
+With one common year, `plot()` compares estimates. With repeated years within
+a series, it draws trends. When countries and sex both vary over time, choose
+`facet = "iso3"` to compare sexes within countries, or `group = "iso3"` to
+compare countries within each sex. The remaining mapping is filled and reported.
+With multiple remaining choices, select or filter the dimensions explicitly.
+
+Each call returns a standard ggplot using a DSIR theme. Comparisons require
+one common year. Mixed units, unresolved strata and duplicate positions cause
+an error; no automatic aggregation or unit conversion occurs. If cleaning
+omitted varying dimensions or units, reclean the original data with the
+retention flags. Reported bounds are optional, without an assumed confidence
+level. Trends break at missing estimates and gaps greater than one year.
+Changed plot-relevant fields need review; use explicit ggplot mappings for
+derived analyses outside this initial contract.
+
+Three offline datasets support discovery without API calls:
+
+```r
+table(gho_catalog$backend)
+sdg_catalog[sdg_catalog$goal == "3", c("code", "description")]
+ghe_catalog[ghe_catalog$kind == "measure", c("code", "label", "unit")]
+dsir_metadata(gho_catalog)$sources
+dsir_metadata(sdg_catalog)$catalog_version
+dsir_metadata(ghe_catalog)$scope
+```
+
+GHO keeps a separate row for each backend's code and language. SDG retains
+linked series in its `series` list-column, including provider release labels.
+GHE keeps causes and measures as separate row kinds, with its cause reference
+country and year in metadata. Catalog versions, DSIR build versions, retrieval
+times and provider releases are separate fields. Historical fallback retains
+its original retrieval time and is marked `bundled_snapshot`. Catalog membership
+does not guarantee that observations can currently be downloaded. Rebuild using
+`data-raw/catalogs.R`; failed or partial refreshes must not replace valid data.
+
+## Experimental maps
+
+`dsir_map()` accepts a `dsir_data` object, an ordinary data frame or an `sf`
+table and returns a standard ggplot. Install the optional `sf` package first.
+Select one indicator, unit and population stratum, with one observation per
+area and a common year. Known semantic fields are checked; no aggregation or
+latest-year selection occurs.
+
+This complete example maps the 2021 probability of premature mortality from
+four major NCDs in Lao PDR and Viet Nam, for both sexes. It fixes the GHO
+backend to xMart and retains the reported age group and units.
+
+```r
+library(DSIR)
+library(dplyr)
+library(ggplot2)
+library(sf)
+
+country.codes <- c("LAO", "VNM")
+map.year <- 2021L
+cache.dir <- file.path("data-raw", "who-adm0-cache")
+
+data.raw <- gho_data(
+  indicator = "NCDMORT3070",
+  spatial_type = "country",
+  area = country.codes,
+  year_from = map.year,
+  year_to = map.year,
+  dimensions = list(DIM_SEX = "TOTAL", DIM_AGE = "YEARS30-69"),
+  backend = "xmart",
+  clean = FALSE
+)
+if (nrow(data.raw) == 0L) stop("No observations returned; inspect the GHO request warnings.")
+
+data.clean <- gho_clean(data.raw, keep_dimensions = TRUE, keep_metadata = TRUE)
+data.map <- data.clean %>% filter(year == map.year, iso3 %in% country.codes)
+stopifnot(inherits(data.map, "dsir_data"), nrow(data.map) == 2L,
+  setequal(data.map$iso3, country.codes), !anyDuplicated(data.map$iso3),
+  all(is.finite(data.map$value_num)))
+
+map.ncd <- dsir_map(data.map, year = map.year,
+  download = "allow", cache_dir = cache.dir) +
+  labs(title = "Premature mortality from four major NCDs",
+    subtitle = "Lao PDR and Viet Nam | 2021 | Both sexes | Ages 30 to 69") +
+  guides(fill = guide_colourbar(title = "Probability (%)"))
+print(map.ncd)
+
+map.metadata <- dsir_metadata(map.ncd)
+map.metadata$selection
+map.metadata$data$sources
+map.metadata$data$cleaning
+map.metadata$boundaries$sources
+
+# Later calls reuse the cache without contacting WHO.
+map.cached <- dsir_map(data.map, year = map.year,
+  download = "never", cache_dir = cache.dir)
+```
+
+```r
+# Ordinary tables can use any character/factor area key and supplied sf polygons.
+# analysis has columns area_code, rate and unit; borders has area_code and geometry.
+map <- dsir_map(analysis, value = "rate", country = "area_code",
+                boundaries = borders, boundary_key = "area_code")
+```
+
+Without supplied geometry, the function requests only the needed countries
+from the public WHO ADM0 Feature Service, without a WHO account. Its default
+`download = "ask"` asks before an interactive download; scripts and Quarto
+must explicitly allow downloads. Detailed polygons can be large. No boundary
+files are bundled with DSIR. Use `cache_dir` for a project-specific cache and
+`refresh = TRUE` for an explicit refresh. Failed or invalid downloads do not
+replace an existing valid country cache.
+
+WHO source terms require use without modification. The function does not
+repair, simplify or combine source geometries. The service returned empty
+Philippine geometry during development: mapping the Philippines therefore
+requires corrected official data or complete user-supplied boundaries. A
+matching ISO3 code alone does not establish geographic comparability.
+Missing estimates are grey; missing or invalid boundaries cause an error.
+Map metadata describes creation and retains input and boundary records,
+including original retrieval times; it does not track later ggplot edits.
+
+## Added in 0.13.0
 
 - **xMart-first GHO queries:** the default `backend = "auto"` tries legacy only
   for codes missing from the xMart directory or indicators verified to have no
@@ -220,10 +423,10 @@ comparison; value changes and metadata-only changes are reported separately.
 
 ```r
 # Repeat exactly the same query later, using the same backend.
-old_data <- gho_data("WHS4_100", area = "PHL", backend = "xmart")
+old_data <- gho_data("WHS4_100", area = "PHL", backend = "xmart", clean = FALSE)
 data_snapshot(old_data, file = "snapshots/gho_old.rds")
 
-new_data <- gho_data("WHS4_100", area = "PHL", backend = "xmart")
+new_data <- gho_data("WHS4_100", area = "PHL", backend = "xmart", clean = FALSE)
 data_snapshot(new_data, file = "snapshots/gho_new.rds")
 
 result <- compare_snapshots("snapshots/gho_old.rds", "snapshots/gho_new.rds")
@@ -265,7 +468,6 @@ aarr(years, values, method = "endpoint")        # first/last years only
 
 # Slots into a grouped summarise() on cleaned indicator data
 gho_data("NCDMORT3070", area = wpro_cty, dim1 = "SEX_BTSX") |>
-  gho_clean() |>
   dplyr::summarise(aarr = aarr(year, value_num), .by = iso3)
 ```
 
@@ -368,7 +570,7 @@ gho_data(
 gho_data("NCDMORT3070", spatial_type = "country", dim1 = "SEX_BTSX")
 
 # Tidy the raw GHO response
-raw <- gho_data("NCDMORT3070", spatial_type = "country", area = wpro_cty)
+raw <- gho_data("NCDMORT3070", spatial_type = "country", area = wpro_cty, clean = FALSE)
 gho_clean(raw)
 ```
 
@@ -389,7 +591,7 @@ for financial hardship, `dim1_type` can be `WEALTHQUINTILE`,
 
 ```r
 raw <- gho_data("FINANCIALHARDSHIP_PROPORTIONOFPOP", area = "PHL",
-                backend = "legacy")
+                backend = "legacy", clean = FALSE)
 gho_detailed <- gho_clean(raw, keep_dimensions = TRUE, keep_metadata = TRUE)
 gho_detailed |>
   dplyr::select(provider, iso3, year, value_num, dim1_type, dim1, dim2_type, dim2)
@@ -445,7 +647,7 @@ sdg_data("3.4.1", area = wpro_cty)
 sdg_data("3.2.1", area = "608", year_from = 2015, year_to = 2023)
 
 # Tidy the SDG response
-raw <- sdg_data("3.2.1", area = "PHL")
+raw <- sdg_data("3.2.1", area = "PHL", clean = FALSE)
 sdg_clean(raw)
 ```
 
@@ -461,7 +663,7 @@ rows. `value` is kept as character to preserve non-numeric entries
 (`"<0.1"`, aggregate notes); `value_num` is the numeric coercion
 (`NA` where coercion fails).
 
-**Preserving SDG dimensions.** `sdg_data()` retains named breakdowns
+**Preserving SDG dimensions.** `sdg_data(clean = FALSE)` retains named breakdowns
 inside `raw$dimensions`. They do not map to GHO's three dimension
 positions. Use `keep_dimensions = TRUE` to append all observed SDG
 dimensions as character columns such as `dim_age`, `dim_sex`, and
@@ -471,7 +673,7 @@ when using the compact format. Use `keep_metadata = TRUE` to also
 retain units, nature, and other attributes as `attr_*` columns.
 
 ```r
-raw <- sdg_data("3.8.2", area = "PHL")
+raw <- sdg_data("3.8.2", area = "PHL", clean = FALSE)
 unique(raw$dimensions) # Inspect actual dimension names and codes
 financial_hardship <- sdg_clean(
   raw, keep_dimensions = TRUE, keep_metadata = TRUE
@@ -485,9 +687,9 @@ national <- sdg_data(
   dimensions = list(
     Age = "ALLAGE", Location = "ALLAREA", Sex = "BOTHSEX",
     Quantile = "_T", Type_of_household = "_T"
-  )
-) |>
-  sdg_clean(keep_dimensions = TRUE)
+  ),
+  keep_dimensions = TRUE
+)
 ```
 
 **Discovering dimension codes and labels.** This reads official
@@ -548,8 +750,8 @@ output with `bind_indicators()` and use the `source` column to keep
 track of where each row came from:
 
 ```r
-gho <- gho_data("NCDMORT3070", area = wpro_cty) |> gho_clean()
-sdg <- sdg_data("3.4.1",        area = wpro_cty) |> sdg_clean()
+gho <- gho_data("NCDMORT3070", area = wpro_cty)
+sdg <- sdg_data("3.4.1",        area = wpro_cty)
 bind_indicators(gho, sdg)
 ```
 
@@ -583,10 +785,6 @@ sdg_coverage("3.b.1", area = c("156", "608"))
 GHO-style `has_data()` / `count()` helpers are intentionally not
 provided for SDG because SDG data is generally complete enough
 that pre-flight checks add little value.
-
-## License
-
-MIT — © 2026 Shanlong Ding
 
 ### WHO backend selection (0.13.0)
 
@@ -623,7 +821,7 @@ gho_indicators('mortality', backend = 'xmart')
 gho_dimensions('NCDMORT3070', 'DIM_SEX', backend = 'xmart')
 ncd <- gho_data('NCDMORT3070', area = 'PHL', year_from = 2020,
                 year_to = 2021, dimensions = list(DIM_SEX = 'TOTAL'),
-                backend = 'xmart')
+                backend = 'xmart', clean = FALSE)
 gho_clean(ncd, keep_dimensions = TRUE, keep_metadata = TRUE)
 ```
 
@@ -728,3 +926,13 @@ age_standardize(count, population, who_std_pop$weight)
 See the [WHO technical report](https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2023_who_standard_population.pdf),
 Table 1, page 6 (September 2026). The former 21-row object is replaced;
 align observed age groups explicitly before computing a standardized rate.
+
+## Package maintenance
+
+The [repository maintenance guide](https://github.com/shanlong-who/DSIR/blob/main/.github/maintenance/repository-hygiene.md)
+maps the source modules, documentation sources, data rebuild scripts and
+website publication process.
+
+## License
+
+MIT — © 2026 Shanlong Ding

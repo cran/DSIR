@@ -2,6 +2,105 @@
 
 For full source, see <https://github.com/shanlong-who/DSIR>.
 
+# DSIR 0.15.0
+
+* **Breaking default:** `gho_data()` and `sdg_data()` return cleaned
+  `dsir_data` tables. Use `clean = FALSE` for provider columns, raw archives
+  and source snapshots. Both retention flags default to `FALSE`. Set
+  `keep_dimensions` or `keep_metadata` on the download to retain row-level
+  details. GHO continues to prefer xMart in automatic mode.
+* Repeating the corresponding cleaner on a cleaned table preserves the
+  observations and cleaning record. Requesting previously omitted fields
+  explains how to retrieve them.
+* Print and summary show current breakdowns. Cleaning records also preserve
+  unique observed codes for named dimensions, including omitted SDG fields.
+  Their historical scope stays visible after filtering.
+* `plot()` selects a common-year comparison or a trend with repeated years
+  within a series. It can group one identified breakdown or complete a
+  single missing group or facet mapping. Ambiguous series still require a
+  choice. Existing unit, stratum, duplicate and annual-gap checks apply.
+
+# DSIR 0.14.0 (2026-11-01)
+
+Available on GitHub. CRAN remains at 0.13.0. This version combines the
+0.13.0.9000-0.13.0.9003 development work; the S3 and mapping interfaces
+remain experimental.
+
+## Maps
+
+* Report boundary validation failures with area keys, engine versions and
+  specific reasons. Errors carry structured diagnostics; successful maps
+  retain validation records in boundary metadata, including fresh cache
+  checks. Strict validation remains in place without automatic repair.
+* Add experimental `dsir_map()` for `dsir_data`, ordinary analysis tables
+  and `sf` input. Return a standard ggplot with a continuous viridis scale
+  and DSIR theme. Support custom area/value columns and supplied polygons.
+  Require one observation per area and a common year when recorded; check
+  known indicator, unit and population context without aggregating.
+* Download public WHO ADM0 boundaries only for requested ISO3 countries,
+  with interactive permission or explicit `download = "allow"` in scripts.
+  Cache validated polygons outside the package for offline reuse;
+  `download = "never"` prohibits requests. Explicit refresh retains the
+  previous country cache if retrieval or validation fails. `sf` is optional.
+* Record map creation, input metadata and per-country boundary provenance
+  through `dsir_metadata()`, including queries, retrieval dates, item
+  modification dates and download checksums. Reject missing, empty or invalid
+  polygons without repair, simplification or substitution. The tested WHO
+  ADM0 service still returns empty Philippine geometry; a map including it
+  requires corrected official data or complete user-supplied boundaries.
+
+## Data objects and plotting
+
+* **Experimental default change:** `gho_clean()`, `ghe_clean()` and
+  `sdg_clean()` now return `dsir_data`, still inheriting from tibble. Append
+  `output = "tibble"` to retain the ordinary class. The typed 15-column core
+  and optional-column defaults are unchanged. Download and discovery return
+  classes are unchanged.
+* Keep acquisition and cleaning metadata in object attributes, accessible
+  through `dsir_metadata()`. Cleaning records its own time, package version,
+  options, row counts, dimension retention and constant units/context without
+  duplicating raw observations. Plain output also retains these records.
+  Printing shows cleaning context, and summaries include the cleaning record.
+* Add offline `plot.dsir_data()` with explicit `type = "trend"` and
+  `type = "compare"`, country/year selection, colour groups, facets and
+  optional reported bounds. Return standard ggplots with DSIR themes.
+  Reject ambiguous strata, mixed definitions/units, duplicate positions and
+  plot-relevant metadata needing review. Do not aggregate or select a latest
+  year implicitly; trend lines break at missing estimates and annual gaps.
+
+## Acquisition metadata
+
+* Unify acquisition metadata for GHO, GHE and SDG observations and discovery
+  results through `dsir_metadata()`, without changing their default classes
+  or columns. Record actual backends, endpoints, original UTC retrieval times,
+  cache use, source counts, query scope and reported versions. Historical
+  catalog fallback retains its original date. Existing WHO provenance remains
+  available for compatibility.
+* Add SDG pagination and local-filter provenance. Empty, failed, invalid and
+  incomplete results are distinguishable; missing completeness information
+  remains unknown. SDG list failures keep their existing `NULL` return.
+* Preserve acquisition records through all three cleaners, including empty
+  results, and explicit S3 conversion. GHE source-row counts remain separate
+  from long-format measure counts. Directory searches retain the original
+  catalog scope, and GHE cause discovery records its reference selection.
+
+## Explicit conversion and discovery catalogs
+
+* Add experimental `as_dsir_data()` for explicit conversion after cleaning,
+  and `dsir_metadata()` for provenance, field status and current coverage.
+  Downloads and discovery tables keep their existing default return classes;
+  cleaners use the new default described above.
+  Printing and summaries remain offline. Valid column modifications retain
+  the class, mark derived fields and flag changed input semantics for review.
+  Invalid core schemas, joins, binding and persistent grouping return ordinary
+  tables. Source snapshots reject objects whose semantics need review.
+* Add versioned `gho_catalog`, `sdg_catalog` and `ghe_catalog` datasets.
+  GHO retains separate legacy/xMart rows; SDG preserves nested series and
+  provider releases; GHE separates cause and measure rows. Metadata records
+  source retrieval dates, historical fallback, reference scope and package
+  build version. Catalog membership does not establish observation availability.
+  Live discovery, backend selection and the internal legacy fallback are unchanged.
+
 # DSIR 0.13.0 (2026-10-30)
 
 * Reference WHO's official GHO API documentation in DESCRIPTION instead of

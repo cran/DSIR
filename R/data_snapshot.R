@@ -4,7 +4,7 @@
 #' and creation time. It makes no network requests and never fills, rounds,
 #' aggregates or otherwise changes observations.
 #'
-#' @param data A data frame returned by [gho_data()], or by
+#' @param data A data frame returned by [gho_data()] with `clean = FALSE`, or by
 #'   `gho_clean(..., keep_dimensions = TRUE, keep_metadata = TRUE)`.
 #'   The default 15-column cleaned output has insufficient identity context.
 #'   The first schema supports one GHO indicator and one backend per snapshot.
@@ -94,11 +94,11 @@
 #' compare_snapshots(old, new)$modified
 #'
 #' \dontrun{
-#' old_data <- gho_data("WHS4_100")
+#' old_data <- gho_data("WHS4_100", clean = FALSE)
 #' data_snapshot(old_data, file = "snapshots/gho_old.rds")
 #'
 #' # Later, repeat exactly the same query using the same backend.
-#' new_data <- gho_data("WHS4_100")
+#' new_data <- gho_data("WHS4_100", clean = FALSE)
 #' data_snapshot(new_data, file = "snapshots/gho_new.rds")
 #' result <- compare_snapshots("snapshots/gho_old.rds",
 #'                             "snapshots/gho_new.rds")
@@ -108,6 +108,26 @@
 data_snapshot <- function(data, file = NULL, source = NULL, indicator = NULL,
                           backend = NULL, scope = NULL, key = NULL,
                           value_fields = NULL, overwrite = FALSE) {
+  if (inherits(data, "dsir_data")) {
+    metadata <- dsir_metadata(data)
+    if (metadata$processing$semantics == "needs_review") {
+      cli::cli_abort("DSIR metadata needs review after field changes; snapshot the original observations instead.")
+    }
+    if (is.null(scope) && metadata$processing$row_scope != "input") {
+      cli::cli_abort("Supply an explicit {.arg scope} for a row-selected DSIR object.")
+    }
+    data <- .dsi_data_plain(data)
+    if (length(metadata$provenance$retrieval)) {
+      attr(data, "who_provenance") <- metadata$provenance$retrieval
+    }
+    if (!is.null(metadata$sources) || !is.null(metadata$cleaning)) {
+      fields <- intersect(c("schema_version", "source", "kind", "sources", "query", "result", "cleaning"), names(metadata))
+      acquisition <- metadata[fields]
+      acquisition$layout <- if (is.null(metadata$cleaning)) "retrieval" else "cleaning"
+      fields <- c("schema_version", "layout", setdiff(fields, "schema_version"))
+      attr(data, "dsir_metadata") <- acquisition[fields]
+    }
+  }
   .dsi_check_flag(overwrite, "overwrite")
   if (!is.null(file)) {
     .dsi_snapshot_scalar(file, "file")

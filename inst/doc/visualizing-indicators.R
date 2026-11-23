@@ -14,8 +14,7 @@ library(ggplot2)
 
 ## ----eval = FALSE-------------------------------------------------------------
 # ncd <- gho_data("NCDMORT3070", spatial_type = "country",
-#                 area = c("PHL", "VNM", "KHM", "MNG", "FJI", "LAO")) |>
-#   gho_clean()
+#                 area = c("PHL", "VNM", "KHM", "MNG", "FJI", "LAO"))
 
 ## ----simulate-----------------------------------------------------------------
 set.seed(416)
@@ -58,6 +57,18 @@ ncd <- grid |>
          value, value_num, low, high, series, dim1, dim2, dim3)
 
 ncd
+
+## ----s3-trend, fig.width = 6.5, fig.height = 4--------------------------------
+data.plot <- ncd %>%
+  filter(dim1 == "SEX_BTSX") %>%
+  mutate(unit = "percent") %>%
+  as_dsir_data()
+
+plot(data.plot, country = "PHL", interval = TRUE)
+
+## ----s3-compare, fig.width = 6.5, fig.height = 4.5----------------------------
+plot(data.plot, year = 2023, interval = TRUE) +
+  labs(title = "Illustrative country comparison")
 
 ## ----ribbon, fig.height = 4.5-------------------------------------------------
 ncd |>

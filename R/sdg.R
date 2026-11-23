@@ -68,12 +68,13 @@
 #' sdg_goals()
 #' sdg_goals(include_children = TRUE)
 #' }
+#' @inheritSection dsir_metadata Retrieval metadata
 sdg_goals <- function(include_children = FALSE) {
   url <- paste0(
     "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Goal/List",
     "?includechildren=", tolower(as.character(include_children))
   )
-  .sdg_get(url)
+  .dsi_result(.sdg_get(url), "sdg", "goals", query = list(include_children = include_children))
 }
 
 
@@ -93,12 +94,13 @@ sdg_goals <- function(include_children = FALSE) {
 #' \donttest{
 #' sdg_targets()
 #' }
+#' @inheritSection dsir_metadata Retrieval metadata
 sdg_targets <- function(include_children = FALSE) {
   url <- paste0(
     "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Target/List",
     "?includechildren=", tolower(as.character(include_children))
   )
-  .sdg_get(url)
+  .dsi_result(.sdg_get(url), "sdg", "targets", query = list(include_children = include_children))
 }
 
 
@@ -142,21 +144,24 @@ sdg_targets <- function(include_children = FALSE) {
 #' sdg_indicators("mortality cancer")
 #' sdg_indicators(c("maternal", "mortality"))
 #' }
+#' @inheritSection dsir_metadata Retrieval metadata
 sdg_indicators <- function(search = NULL) {
   terms <- if (is.null(search)) NULL else .sdg_indicators_parse_terms(search)
 
   res <- .sdg_get(
     "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Indicator/List"
   )
+  res <- .dsi_result(res, "sdg", "indicators", query = list(search = search))
   if (is.null(terms) || is.null(res)) return(res)
-  if (!"description" %in% names(res)) return(res[integer(0), , drop = FALSE])
+  if (!"description" %in% names(res)) return(.dsi_result(res[integer(0), , drop = FALSE],
+    "sdg", "indicators", query = list(search = search), origin = res, status = "invalid"))
 
   haystack <- tolower(res$description)
   keep <- rep(TRUE, length(haystack))
   for (term in tolower(terms)) {
     keep <- keep & grepl(term, haystack, fixed = TRUE)
   }
-  res[which(keep), , drop = FALSE]
+  .dsi_result(res[which(keep), , drop = FALSE], "sdg", "indicators", query = list(search = search), origin = res)
 }
 
 
@@ -194,8 +199,9 @@ sdg_indicators <- function(search = NULL) {
 #' \donttest{
 #' sdg_areas()
 #' }
+#' @inheritSection dsir_metadata Retrieval metadata
 sdg_areas <- function() {
-  .sdg_get("https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/GeoArea/List")
+  .dsi_result(.sdg_get("https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/GeoArea/List"), "sdg", "areas")
 }
 
 
@@ -229,9 +235,12 @@ sdg_areas <- function() {
 #'   and series filters, these filters run client-side and do not reduce
 #'   the number of downloaded pages.
 #'
-#' @return A [tibble][tibble::tibble] of indicator observations, or
-#'   an empty tibble when the service is unreachable or there are no
-#'   matching rows. The raw `dimensions` and `attributes` columns retain
+#' @param clean Logical. Return cleaned observations as a `dsir_data` tibble
+#'   by default. Use `FALSE` for the original observation columns.
+#' @inheritParams sdg_clean
+#' @return A cleaned [dsir_data][as_dsir_data] table, or the original
+#'   observation tibble with `clean = FALSE`. Empty cleaned results have
+#'   the same core schema. The raw `dimensions` and `attributes` columns retain
 #'   the API's named breakdowns and attributes (usually packed data-frame
 #'   columns). Inspect `unique(df$dimensions)` to discover observed strata.
 #'   Use `sdg_clean(df, keep_dimensions = TRUE)` to retain named dimensions
@@ -254,11 +263,15 @@ sdg_areas <- function() {
 #' # ISO3 codes work directly — DSIR's regional vectors can be passed in
 #' sdg_data("3.4.1", area = c("PHL", "FRA", "JPN"))
 #' }
+#' @inheritSection dsir_metadata Retrieval metadata
 sdg_data <- function(indicator, area = NULL,
                      year_from = NULL, year_to = NULL,
-                     page_size = 1000L, series = NULL, dimensions = NULL) {
+                     page_size = 1000L, series = NULL, dimensions = NULL,
+                     clean = TRUE, keep_dimensions = FALSE, keep_metadata = FALSE) {
+  .dsi_check_clean_options(clean, keep_dimensions, keep_metadata)
   stopifnot(is.character(indicator), length(indicator) >= 1L)
   .sdg_validate_filters(series, dimensions)
+  requested_area <- area
   area <- .resolve_area(area)
 
   # The SDG API expects multi-value parameters as repeated keys
@@ -280,7 +293,18 @@ sdg_data <- function(indicator, area = NULL,
   url <- paste0(base_url, "?", paste(parts, collapse = "&"))
 
   out <- .sdg_collect_pages(url, indicator)
-  if (nrow(out) == 0L) return(out)
+  origin <- out
+  query <- list(indicator = indicator, area = requested_area, area_codes = area,
+    year_from = year_from, year_to = year_to, series = series,
+    dimensions = dimensions, page_size = page_size,
+    local_filters = c("year", "series", "dimensions"))
+  finish <- function(data, status = NULL) {
+    data <- .dsi_result(data, "sdg", "observations", query = query, origin = origin,
+      backend = "unsdg", endpoint = base_url, status = status)
+    if (clean) sdg_clean(data, keep_dimensions, keep_metadata) else data
+  }
+  if (nrow(out) == 0L) return(finish(out))
+  status <- NULL
 
   # Client-side year filter — workaround for UN SDG API bug where
   # timePeriodStart / timePeriodEnd cause HTTP 500 server-side.
@@ -290,6 +314,7 @@ sdg_data <- function(indicator, area = NULL,
         "Cannot apply year filter: {.field timePeriodStart} column missing.",
         "i" = "Returning unfiltered data."
       ))
+      status <- "invalid"
     } else {
       yr <- suppressWarnings(as.integer(out$timePeriodStart))
       keep <- !is.na(yr)
@@ -299,7 +324,9 @@ sdg_data <- function(indicator, area = NULL,
     }
   }
 
-  .sdg_filter_observations(out, series, dimensions)
+  if ((!is.null(series) && !"series" %in% names(out)) ||
+      (length(dimensions) && !all(names(dimensions) %in% names(.sdg_dimensions_frame(out))))) status <- "invalid"
+  finish(.sdg_filter_observations(out, series, dimensions), status = status)
 }
 
 
@@ -357,7 +384,9 @@ sdg_data <- function(indicator, area = NULL,
 #' SDG dimensions as additional columns. The default compact output omits
 #' them, so filter to the required strata before using it for analysis.
 #'
-#' @param df A data frame returned by [sdg_data()].
+#' @param df Raw observations from [sdg_data()] with `clean = FALSE`, or an
+#'   already cleaned SDG table. Repeated cleaning preserves retained fields.
+#'   Request additional fields at download time or clean the raw observations.
 #' @param keep_dimensions Logical. Append the named SDG dimensions as
 #'   character columns? Default `FALSE` preserves the 15-column format.
 #'   With `TRUE`, names are converted to snake_case and prefixed with
@@ -378,7 +407,9 @@ sdg_data <- function(indicator, area = NULL,
 #'   missing list fields are empty character vectors. This option is
 #'   independent of `keep_dimensions` and makes no extra network requests.
 #'
-#' @return A [tibble][tibble::tibble] with 15 core columns: `source` (always
+#' @inheritParams gho_clean
+#' @return A [dsir_data][as_dsir_data] tibble, or a plain tibble when requested,
+#'   with 15 core columns: `source` (always
 #'   `"sdg"`), `id`, `indicator`, `location`, `iso3`, `location_name`,
 #'   `year`, `value`, `value_num`, `low`, `high`, `series`, `dim1`
 #'   (`NA`), `dim2` (`NA`), `dim3` (`NA`). Sorted by `location` then
@@ -392,22 +423,30 @@ sdg_data <- function(indicator, area = NULL,
 #'
 #' @examples
 #' \donttest{
-#' sdg_data("3.2.1", area = "156", year_from = 2015) |>
+#' sdg_data("3.2.1", area = "156", year_from = 2015, clean = FALSE) |>
 #'   sdg_clean(keep_dimensions = TRUE)
 #' }
-sdg_clean <- function(df, keep_dimensions = FALSE, keep_metadata = FALSE) {
+#' @inheritSection dsir_metadata Retrieval metadata
+sdg_clean <- function(df, keep_dimensions = FALSE, keep_metadata = FALSE,
+                      output = c("dsir_data", "tibble")) {
+  output <- match.arg(output)
   if (!is.data.frame(df)) {
     cli::cli_abort("{.arg df} must be a data frame.")
   }
   .dsi_check_flag(keep_dimensions, "keep_dimensions")
   .dsi_check_flag(keep_metadata, "keep_metadata")
 
+  if (.dsi_is_clean_table(df)) {
+    return(.dsi_reclean(df, "sdg", keep_dimensions, keep_metadata, output))
+  }
+
   n <- nrow(df)
   if (n == 0L) {
     out <- .dsi_empty_clean()
     if (keep_dimensions) out <- .sdg_append_dimensions(out, df)
     if (keep_metadata) out <- .sdg_append_metadata(out, df)
-    return(out)
+    return(.dsi_finish_clean(out, df, "sdg", output,
+      list(keep_dimensions = keep_dimensions, keep_metadata = keep_metadata)))
   }
 
   flatten_chr <- function(src) {
@@ -466,7 +505,8 @@ sdg_clean <- function(df, keep_dimensions = FALSE, keep_metadata = FALSE) {
   if (keep_dimensions) out <- .sdg_append_dimensions(out, df)
   if (keep_metadata) out <- .sdg_append_metadata(out, df)
 
-  out[order(out$location, out$year), , drop = FALSE]
+  .dsi_finish_clean(out, df, "sdg", output,
+    list(keep_dimensions = keep_dimensions, keep_metadata = keep_metadata))
 }
 
 
@@ -511,5 +551,13 @@ sdg_clean <- function(df, keep_dimensions = FALSE, keep_metadata = FALSE) {
     }
   )
   if (is.null(out)) return(NULL)
-  if (is.data.frame(out)) tibble::as_tibble(out) else out
+  if (is.data.frame(out)) out <- tibble::as_tibble(out)
+  releases <- .dsi_sdg_releases(out)
+  directory <- !grepl("/Data([?]|$)", url)
+  verified_list <- is.data.frame(out) || identical(out, list())
+  .dsi_record(out, "sdg", "unsdg", sub("[?].*$", "", url),
+    query = list(url = url), retrieved_at = .dsi_timestamp(),
+    status = if (directory && !verified_list) "unverified" else if (.dsi_record_count(out)) "success" else "empty",
+    complete = if (directory && verified_list) TRUE else NA,
+    api_version = "V5", source_release = if (length(releases)) paste(releases, collapse = "; ") else NA_character_)
 }

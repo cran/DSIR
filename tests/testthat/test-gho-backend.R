@@ -47,14 +47,16 @@ test_that('all GHO queries select the requested provider with consistent filters
       '"DIM_GEO_CODE_TYPE":"COUNTRY","DIM_SEX":"TOTAL","PERCENT_N":10}]}'))
   }
   httr2::with_mocked_responses(mock, {
-    out <- gho_data('X', backend = 'xmart')
+    out <- gho_data('X', backend = 'xmart', clean = FALSE)
     expect_equal(out$NumericValue, 10)
     expect_equal(out$Provider, 'xmart')
     expect_equal(attr(out, 'who_provenance')$backend, 'xmart')
     expect_true(gho_has_data('X', backend = 'xmart'))
     expect_identical(gho_count('X', backend = 'xmart'), 1L)
     expect_equal(gho_coverage('X', backend = 'xmart')$year_min, 2023L)
-    expect_equal(gho_dimensions('X', 'DIM_SEX', backend = 'xmart'), 'TOTAL')
+    dimensions <- gho_dimensions('X', 'DIM_SEX', backend = 'xmart')
+    expect_equal(as.character(dimensions), 'TOTAL')
+    expect_identical(dsir_metadata(dimensions)$sources$backend, 'xmart')
   })
   expect_length(urls, 5L)
   expect_true(all(startsWith(urls, 'https://xmart-api-public.who.int/')))
@@ -69,14 +71,16 @@ test_that('all GHO queries select the requested provider with consistent filters
   }
   withr::local_options(DSIR.who_backend = 'xmart')
   httr2::with_mocked_responses(mock, {
-    out <- gho_data('X', dim1 = 'SEX_BTSX', backend = 'legacy')
+    out <- gho_data('X', dim1 = 'SEX_BTSX', backend = 'legacy', clean = FALSE)
     expect_equal(out$Provider, 'legacy')
     expect_equal(attr(out, 'who_provenance')$backend, 'legacy')
     expect_true(attr(out, 'who_provenance')$complete)
     expect_true(gho_has_data('X', dim1 = 'SEX_BTSX', backend = 'legacy'))
     expect_identical(gho_count('X', dim1 = 'SEX_BTSX', backend = 'legacy'), 1L)
     expect_equal(unname(gho_coverage('X', dim1 = 'SEX_BTSX', backend = 'legacy')$year_min), 2023L)
-    expect_equal(gho_dimensions('X', 'Dim1', backend = 'legacy'), 'SEX_BTSX')
+    dimensions <- gho_dimensions('X', 'Dim1', backend = 'legacy')
+    expect_equal(as.character(dimensions), 'SEX_BTSX')
+    expect_identical(dsir_metadata(dimensions)$sources$backend, 'legacy')
   })
   expect_length(urls, 5L)
   expect_true(all(startsWith(urls, 'https://ghoapi.azureedge.net/api/X')))
@@ -100,7 +104,7 @@ test_that('invalid backend arguments fail before any request and preserve option
       expect_error(do.call(query$fun, c(query$args, list(backend = backend))), 'backend')
     }
   }
-  expect_error(gho_data('X', dimensions = list(DIM_SEX = 'TOTAL')), 'xMart backend')
+  expect_error(gho_data('X', dimensions = list(DIM_SEX = 'TOTAL'), clean = FALSE), 'xMart backend')
   expect_equal(getOption('DSIR.who_backend'), 'legacy')
 })
 
@@ -126,7 +130,7 @@ test_that('cleaning resolves labels with recorded providers after options change
   core <- gho_clean(raw)
   detailed <- gho_clean(raw, keep_metadata = TRUE)
   expect_equal(ncol(core), 15L)
-  expect_identical(detailed[names(core)], core)
+  expect_identical(tibble::as_tibble(detailed)[names(core)], tibble::as_tibble(core))
   expect_equal(detailed$indicator, c('xMart label', 'Legacy label'))
   expect_equal(detailed$provider, c('xmart', 'legacy'))
   expect_equal(detailed$value_num, c(10, 11))
@@ -158,7 +162,7 @@ test_that('provider columns survive binding and unknown input is not relabelled'
   expect_type(gho_clean(tibble::tibble(), keep_metadata = TRUE)$provider, 'character')
   raw <- raw[0, ]
   attr(raw, 'who_provenance') <- list(backend = 'xmart', complete = TRUE, rows = 0L)
-  expect_identical(attr(gho_clean(raw), 'who_provenance'), attr(raw, 'who_provenance'))
+  expect_identical(dsir_metadata(gho_clean(raw))$provenance$retrieval, attr(raw, 'who_provenance'))
 })
 
 test_that('valid empty GHO selections are informational and retain scalar contracts', {
@@ -166,7 +170,7 @@ test_that('valid empty GHO selections are informational and retain scalar contra
   testthat::local_mocked_bindings(.xmart_gho_context = function(...) context, .package = 'DSIR')
   for (backend in c('legacy', 'xmart')) {
     httr2::with_mocked_responses(function(req) who_response('{"@odata.count":0,"value":[]}'), {
-      expect_message(out <- gho_data('X', backend = backend), 'No GHO observations match')
+      expect_message(out <- gho_data('X', backend = backend, clean = FALSE), 'No GHO observations match')
       expect_equal(nrow(out), 0L)
       expect_message(exists <- gho_has_data('X', backend = backend), 'No GHO observations match')
       expect_identical(exists, FALSE)
@@ -202,7 +206,7 @@ test_that('legacy 404 classification requires a successful directory check', {
     }
     warnings <- character()
     httr2::with_mocked_responses(mock, withCallingHandlers(
-      gho_data('X', backend = 'legacy'), warning = function(w) {
+      gho_data('X', backend = 'legacy', clean = FALSE), warning = function(w) {
         warnings <<- c(warnings, conditionMessage(w)); invokeRestart('muffleWarning')
       }
     ))
@@ -214,7 +218,7 @@ test_that('legacy 404 classification requires a successful directory check', {
 test_that('malformed legacy responses are failures rather than empty selections', {
   for (body in c('42', '{"error":"unavailable"}', '{"value":null}', '{"value":[1,2]}')) {
     httr2::with_mocked_responses(who_page(body), {
-      expect_warning(out <- gho_data('X', backend = 'legacy'), 'Malformed GHO response')
+      expect_warning(out <- gho_data('X', backend = 'legacy', clean = FALSE), 'Malformed GHO response')
       expect_equal(nrow(out), 0L)
     })
   }
@@ -234,7 +238,7 @@ test_that('GHO request failures never fall back or report a valid empty selectio
   )
   messages <- character()
   httr2::with_mocked_responses(list(who_response('{}', 404L)), withCallingHandlers({
-    expect_warning(out <- gho_data('X', backend = 'xmart'), 'WHO request failed')
+    expect_warning(out <- gho_data('X', backend = 'xmart', clean = FALSE), 'WHO request failed')
     expect_equal(nrow(out), 0L)
   }, message = function(m) { messages <<- c(messages, conditionMessage(m)) }))
   expect_false(any(grepl('No GHO observations match', messages, fixed = TRUE)))
